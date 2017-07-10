@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  * workspace_name: the name of the workspace it gets saved to
  * alignment_object_name: output Alignment or AlignmentSet object name
  * optional params:
+ * reads_condition: condition associated with the input reads objec (ignored for sets of samples)
  * num_threads: number of processing threads
  * read_mismatches: read mismatch cutoff
  * read_gap_length: read gap cutoff
@@ -42,6 +43,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "assembly_or_genome_ref",
     "workspace_name",
     "alignment_object_name",
+    "reads_condition",
     "num_threads",
     "read_mismatches",
     "read_gap_length",
@@ -64,6 +66,8 @@ public class TopHatInput {
     private String workspaceName;
     @JsonProperty("alignment_object_name")
     private String alignmentObjectName;
+    @JsonProperty("reads_condition")
+    private String readsCondition;
     @JsonProperty("num_threads")
     private Long numThreads;
     @JsonProperty("read_mismatches")
@@ -145,6 +149,21 @@ public class TopHatInput {
 
     public TopHatInput withAlignmentObjectName(String alignmentObjectName) {
         this.alignmentObjectName = alignmentObjectName;
+        return this;
+    }
+
+    @JsonProperty("reads_condition")
+    public String getReadsCondition() {
+        return readsCondition;
+    }
+
+    @JsonProperty("reads_condition")
+    public void setReadsCondition(String readsCondition) {
+        this.readsCondition = readsCondition;
+    }
+
+    public TopHatInput withReadsCondition(String readsCondition) {
+        this.readsCondition = readsCondition;
         return this;
     }
 
@@ -325,7 +344,7 @@ public class TopHatInput {
 
     @Override
     public String toString() {
-        return ((((((((((((((((((((((((((((((((("TopHatInput"+" [inputRef=")+ inputRef)+", assemblyOrGenomeRef=")+ assemblyOrGenomeRef)+", workspaceName=")+ workspaceName)+", alignmentObjectName=")+ alignmentObjectName)+", numThreads=")+ numThreads)+", readMismatches=")+ readMismatches)+", readGapLength=")+ readGapLength)+", readEditDist=")+ readEditDist)+", minIntronLength=")+ minIntronLength)+", maxIntronLength=")+ maxIntronLength)+", minAnchorLength=")+ minAnchorLength)+", reportSecondaryAlignments=")+ reportSecondaryAlignments)+", noCoverageSearch=")+ noCoverageSearch)+", libraryType=")+ libraryType)+", presetOptions=")+ presetOptions)+", additionalProperties=")+ additionalProperties)+"]");
+        return ((((((((((((((((((((((((((((((((((("TopHatInput"+" [inputRef=")+ inputRef)+", assemblyOrGenomeRef=")+ assemblyOrGenomeRef)+", workspaceName=")+ workspaceName)+", alignmentObjectName=")+ alignmentObjectName)+", readsCondition=")+ readsCondition)+", numThreads=")+ numThreads)+", readMismatches=")+ readMismatches)+", readGapLength=")+ readGapLength)+", readEditDist=")+ readEditDist)+", minIntronLength=")+ minIntronLength)+", maxIntronLength=")+ maxIntronLength)+", minAnchorLength=")+ minAnchorLength)+", reportSecondaryAlignments=")+ reportSecondaryAlignments)+", noCoverageSearch=")+ noCoverageSearch)+", libraryType=")+ libraryType)+", presetOptions=")+ presetOptions)+", additionalProperties=")+ additionalProperties)+"]");
     }
 
 }

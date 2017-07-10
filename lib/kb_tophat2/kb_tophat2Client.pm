@@ -126,6 +126,7 @@ TopHatInput is a reference to a hash where the following keys are defined:
 	assembly_or_genome_ref has a value which is a kb_tophat2.obj_ref
 	workspace_name has a value which is a string
 	alignment_object_name has a value which is a string
+	reads_condition has a value which is a string
 	num_threads has a value which is an int
 	read_mismatches has a value which is an int
 	read_gap_length has a value which is an int
@@ -158,6 +159,7 @@ TopHatInput is a reference to a hash where the following keys are defined:
 	assembly_or_genome_ref has a value which is a kb_tophat2.obj_ref
 	workspace_name has a value which is a string
 	alignment_object_name has a value which is a string
+	reads_condition has a value which is a string
 	num_threads has a value which is an int
 	read_mismatches has a value which is an int
 	read_gap_length has a value which is an int
@@ -403,6 +405,7 @@ workspace_name: the name of the workspace it gets saved to
 alignment_object_name: output Alignment or AlignmentSet object name
 
 optional params:
+reads_condition: condition associated with the input reads objec (ignored for sets of samples)
 num_threads: number of processing threads
 read_mismatches: read mismatch cutoff
 read_gap_length: read gap cutoff
@@ -428,6 +431,7 @@ input_ref has a value which is a kb_tophat2.obj_ref
 assembly_or_genome_ref has a value which is a kb_tophat2.obj_ref
 workspace_name has a value which is a string
 alignment_object_name has a value which is a string
+reads_condition has a value which is a string
 num_threads has a value which is an int
 read_mismatches has a value which is an int
 read_gap_length has a value which is an int
@@ -451,6 +455,7 @@ input_ref has a value which is a kb_tophat2.obj_ref
 assembly_or_genome_ref has a value which is a kb_tophat2.obj_ref
 workspace_name has a value which is a string
 alignment_object_name has a value which is a string
+reads_condition has a value which is a string
 num_threads has a value which is an int
 read_mismatches has a value which is an int
 read_gap_length has a value which is an int

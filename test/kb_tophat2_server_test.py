@@ -167,7 +167,18 @@ class kb_tophat2Test(unittest.TestCase):
             'input_ref': self.se_reads_ref,
             'assembly_or_genome_ref': self.assembly_ref,
             'workspace_name': self.getWsName(),
-            'alignment_object_name': 'My_Alignment'
+            'alignment_object_name': 'My_Alignment',
+            'reads_condition': "unspecified",
+            'read_mismatches': 2,
+            'read_gap_length': 2,
+            'read_edit_dist': 2,
+            'min_intron_length': 70,
+            'max_intron_length': 500000,
+            'min_anchor_length': 8,
+            'report_secondary_alignments': 1,
+            'no_coverage_search': 1,
+            'library_type': 'fr-unstranded',
+            'preset_options': 'b2-very-fast'
         }
 
         result = self.getImpl().run_tophat2_app(self.getContext(), input_params)[0]
@@ -183,7 +194,17 @@ class kb_tophat2Test(unittest.TestCase):
             'assembly_or_genome_ref': self.assembly_ref,
             'workspace_name': self.getWsName(),
             'alignment_object_name': 'My_Alignment',
-            'reads_condition': 'test_condition'
+            'reads_condition': "unspecified",
+            'read_mismatches': 2,
+            'read_gap_length': 2,
+            'read_edit_dist': 2,
+            'min_intron_length': 70,
+            'max_intron_length': 500000,
+            'min_anchor_length': 8,
+            'report_secondary_alignments': 1,
+            'no_coverage_search': 1,
+            'library_type': 'fr-unstranded',
+            'preset_options': 'b2-very-fast'
         }
 
         result = self.getImpl().run_tophat2_app(self.getContext(), input_params)[0]

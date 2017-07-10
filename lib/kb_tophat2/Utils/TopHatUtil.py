@@ -172,7 +172,7 @@ class TopHatUtil:
 
         preset_options = cli_option_params.get('preset_options')
         if preset_options:
-            command += '{}'.format('--' + preset_options)
+            command += '{} '.format('--' + preset_options)
 
         command += '{} {}'.format(genome_index_base, ' '.join(reads_files))
 
