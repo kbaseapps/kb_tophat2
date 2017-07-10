@@ -12,6 +12,8 @@ def log(message, prefix_newline=False):
 
 class TopHatUtil:
 
+    TOPHAT2_TOOLKIT_PATH = '/kb/deployment/bin/TopHat2'
+
     def _validate_run_tophat2_app_params(self, params):
         """
         _validate_run_tophat2_app_params:
