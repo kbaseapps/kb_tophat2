@@ -295,6 +295,10 @@
                   "target_property": "wsName"
                 },
                 {
+                  "narrative_system_variable": "workspace",
+                  "target_property": "workspace"
+                },
+                {
                   "service_method_output_path": [0, "result_directory"],
                   "target_property": "result_directory"
                 },
