@@ -24,7 +24,7 @@ class kb_tophat2:
     ######################################### noqa
     VERSION = "1.0.0"
     GIT_URL = "https://github.com/Tianhao-Gu/kb_tophat2.git"
-    GIT_COMMIT_HASH = "3b3b225fbb95f6caaa344b81d0be57c13e3f0b0c"
+    GIT_COMMIT_HASH = "f834270fc0afab124016c03e0b9a22465349de0b"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
