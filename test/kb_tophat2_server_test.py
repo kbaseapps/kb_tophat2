@@ -3,7 +3,7 @@ import unittest
 import os  # noqa: F401
 import json  # noqa: F401
 import time
-import requests
+import requests  # noqa: F401
 
 from os import environ
 try:
@@ -17,6 +17,7 @@ from biokbase.workspace.client import Workspace as workspaceService
 from kb_tophat2.kb_tophat2Impl import kb_tophat2
 from kb_tophat2.kb_tophat2Server import MethodContext
 from kb_tophat2.authclient import KBaseAuth as _KBaseAuth
+from kb_tophat2.Utils.TopHatUtil import TopHatUtil
 
 
 class kb_tophat2Test(unittest.TestCase):
@@ -51,23 +52,29 @@ class kb_tophat2Test(unittest.TestCase):
         cls.scratch = cls.cfg['scratch']
         cls.callback_url = os.environ['SDK_CALLBACK_URL']
 
+        suffix = int(time.time() * 1000)
+        cls.wsName = "test_kb_tophat2_" + str(suffix)
+        cls.wsClient.create_workspace({'workspace': cls.wsName})
+
+        cls.tophat_runner = TopHatUtil(cls.cfg)
+
+        cls.prepare_data()
+
     @classmethod
     def tearDownClass(cls):
         if hasattr(cls, 'wsName'):
             cls.wsClient.delete_workspace({'workspace': cls.wsName})
             print('Test workspace was deleted')
 
+    @classmethod
+    def prepare_data(cls):
+        pass
+
     def getWsClient(self):
         return self.__class__.wsClient
 
     def getWsName(self):
-        if hasattr(self.__class__, 'wsName'):
-            return self.__class__.wsName
-        suffix = int(time.time() * 1000)
-        wsName = "test_kb_tophat2_" + str(suffix)
-        ret = self.getWsClient().create_workspace({'workspace': wsName})  # noqa
-        self.__class__.wsName = wsName
-        return wsName
+        return self.__class__.wsName
 
     def getImpl(self):
         return self.__class__.serviceImpl
@@ -75,15 +82,43 @@ class kb_tophat2Test(unittest.TestCase):
     def getContext(self):
         return self.__class__.ctx
 
-    # NOTE: According to Python unittest naming rules test method names should start from 'test'. # noqa
-    def test_your_method(self):
-        # Prepare test objects in workspace if needed using
-        # self.getWsClient().save_objects({'workspace': self.getWsName(),
-        #                                  'objects': []})
-        #
-        # Run your method by
-        # ret = self.getImpl().your_method(self.getContext(), parameters...)
-        #
-        # Check returned data with
-        # self.assertEqual(ret[...], ...) or other unittest methods
-        pass
+    def test_bad_run_tophat2_app_params(self):
+        invalidate_input_params = {
+            'missing_reads_ref': 'reads_ref',
+            'bowtie_index': 'bowtie_index',
+            'workspace_name': 'workspace_name',
+            'alignment_object_name': 'alignment_object_name'
+        }
+        with self.assertRaisesRegexp(
+                ValueError, '"reads_ref" parameter is required, but missing'):
+            self.getImpl().run_tophat2_app(self.getContext(), invalidate_input_params)
+
+        invalidate_input_params = {
+            'reads_ref': 'reads_ref',
+            'missing_bowtie_index': 'bowtie_index',
+            'workspace_name': 'workspace_name',
+            'alignment_object_name': 'alignment_object_name'
+        }
+        with self.assertRaisesRegexp(
+                ValueError, '"bowtie_index" parameter is required, but missing'):
+            self.getImpl().run_tophat2_app(self.getContext(), invalidate_input_params)
+
+        invalidate_input_params = {
+            'reads_ref': 'reads_ref',
+            'bowtie_index': 'bowtie_index',
+            'missing_workspace_name': 'workspace_name',
+            'alignment_object_name': 'alignment_object_name'
+        }
+        with self.assertRaisesRegexp(
+                ValueError, '"workspace_name" parameter is required, but missing'):
+            self.getImpl().run_tophat2_app(self.getContext(), invalidate_input_params)
+
+        invalidate_input_params = {
+            'reads_ref': 'reads_ref',
+            'bowtie_index': 'bowtie_index',
+            'workspace_name': 'workspace_name',
+            'missing_alignment_object_name': 'alignment_object_name'
+        }
+        with self.assertRaisesRegexp(
+                ValueError, '"alignment_object_name" parameter is required, but missing'):
+            self.getImpl().run_tophat2_app(self.getContext(), invalidate_input_params)
