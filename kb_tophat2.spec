@@ -14,12 +14,13 @@ module kb_tophat2 {
 
     /*  
         required params:
-        reads_ref: input reads object (Single/Paired_reads, reads_set, sample_set)
-        bowtie_index: indexed genome object ref built using Bowtie2
+        input_ref: input reads object (Single/Paired_reads, reads_set, sample_set)
+        assembly_or_genome_ref: ref to Assembly, ContigSet, or Genome
         workspace_name: the name of the workspace it gets saved to
         alignment_object_name: output Alignment or AlignmentSet object name
 
         optional params:
+        reads_condition: condition associated with the input reads objec (ignored for sets of samples)
         num_threads: number of processing threads
         read_mismatches: read mismatch cutoff
         read_gap_length: read gap cutoff
@@ -35,11 +36,12 @@ module kb_tophat2 {
         ref: https://ccb.jhu.edu/software/tophat/manual.shtml
     */
     typedef structure {
-        obj_ref reads_ref;
-        obj_ref bowtie_index;
+        obj_ref input_ref;
+        obj_ref assembly_or_genome_ref;
         string workspace_name;
         string alignment_object_name;
-
+        
+        string reads_condition;
         int num_threads;
         int read_mismatches;
         int read_gap_length;

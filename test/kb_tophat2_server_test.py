@@ -4,6 +4,7 @@ import os  # noqa: F401
 import json  # noqa: F401
 import time
 import requests  # noqa: F401
+import shutil
 
 from os import environ
 try:
@@ -18,6 +19,8 @@ from kb_tophat2.kb_tophat2Impl import kb_tophat2
 from kb_tophat2.kb_tophat2Server import MethodContext
 from kb_tophat2.authclient import KBaseAuth as _KBaseAuth
 from kb_tophat2.Utils.TopHatUtil import TopHatUtil
+from AssemblyUtil.AssemblyUtilClient import AssemblyUtil
+from ReadsUtils.ReadsUtilsClient import ReadsUtils
 
 
 class kb_tophat2Test(unittest.TestCase):
@@ -58,6 +61,9 @@ class kb_tophat2Test(unittest.TestCase):
 
         cls.tophat_runner = TopHatUtil(cls.cfg)
 
+        cls.ru = ReadsUtils(cls.callback_url)
+        cls.au = AssemblyUtil(cls.callback_url)
+
         cls.prepare_data()
 
     @classmethod
@@ -68,7 +74,40 @@ class kb_tophat2Test(unittest.TestCase):
 
     @classmethod
     def prepare_data(cls):
-        pass
+        # upload reads object
+        fwd_reads_file_name = 'reads_1.fq'
+        fwd_reads_file_path = os.path.join(cls.scratch, fwd_reads_file_name)
+        shutil.copy(os.path.join('data', fwd_reads_file_name), fwd_reads_file_path)
+
+        rev_reads_file_name = 'reads_2.fq'
+        rev_reads_file_path = os.path.join(cls.scratch, rev_reads_file_name)
+        shutil.copy(os.path.join('data', rev_reads_file_name), rev_reads_file_path)
+
+        se_reads_object_name = 'test_se_reads'
+        cls.se_reads_ref = cls.ru.upload_reads({'fwd_file': fwd_reads_file_path,
+                                                'wsname': cls.wsName,
+                                                'sequencing_tech': 'Unknown',
+                                                'name': se_reads_object_name
+                                                })['obj_ref']
+
+        pe_reads_object_name = 'test_pe_reads'
+        cls.pe_reads_ref = cls.ru.upload_reads({'fwd_file': fwd_reads_file_path,
+                                                'rev_file': rev_reads_file_path,
+                                                'wsname': cls.wsName,
+                                                'sequencing_tech': 'Unknown',
+                                                'name': pe_reads_object_name
+                                                })['obj_ref']
+
+        # upload assembly object
+        fasta_file_name = 'test_ref.fa'
+        fasta_file_path = os.path.join(cls.scratch, fasta_file_name)
+        shutil.copy(os.path.join('data', fasta_file_name), fasta_file_path)
+
+        assemlby_name = 'test_assembly'
+        cls.assembly_ref = cls.au.save_assembly_from_fasta({'file': {'path': fasta_file_path},
+                                                            'workspace_name': cls.wsName,
+                                                            'assembly_name': assemlby_name
+                                                            })
 
     def getWsClient(self):
         return self.__class__.wsClient
@@ -84,28 +123,28 @@ class kb_tophat2Test(unittest.TestCase):
 
     def test_bad_run_tophat2_app_params(self):
         invalidate_input_params = {
-            'missing_reads_ref': 'reads_ref',
-            'bowtie_index': 'bowtie_index',
+            'missing_input_ref': 'input_ref',
+            'assembly_or_genome_ref': 'assembly_or_genome_ref',
             'workspace_name': 'workspace_name',
             'alignment_object_name': 'alignment_object_name'
         }
         with self.assertRaisesRegexp(
-                ValueError, '"reads_ref" parameter is required, but missing'):
+                ValueError, '"input_ref" parameter is required, but missing'):
             self.getImpl().run_tophat2_app(self.getContext(), invalidate_input_params)
 
         invalidate_input_params = {
-            'reads_ref': 'reads_ref',
-            'missing_bowtie_index': 'bowtie_index',
+            'input_ref': 'input_ref',
+            'missing_assembly_or_genome_ref': 'assembly_or_genome_ref',
             'workspace_name': 'workspace_name',
             'alignment_object_name': 'alignment_object_name'
         }
         with self.assertRaisesRegexp(
-                ValueError, '"bowtie_index" parameter is required, but missing'):
+                ValueError, '"assembly_or_genome_ref" parameter is required, but missing'):
             self.getImpl().run_tophat2_app(self.getContext(), invalidate_input_params)
 
         invalidate_input_params = {
-            'reads_ref': 'reads_ref',
-            'bowtie_index': 'bowtie_index',
+            'input_ref': 'input_ref',
+            'assembly_or_genome_ref': 'assembly_or_genome_ref',
             'missing_workspace_name': 'workspace_name',
             'alignment_object_name': 'alignment_object_name'
         }
@@ -114,11 +153,42 @@ class kb_tophat2Test(unittest.TestCase):
             self.getImpl().run_tophat2_app(self.getContext(), invalidate_input_params)
 
         invalidate_input_params = {
-            'reads_ref': 'reads_ref',
-            'bowtie_index': 'bowtie_index',
+            'input_ref': 'input_ref',
+            'assembly_or_genome_ref': 'assembly_or_genome_ref',
             'workspace_name': 'workspace_name',
             'missing_alignment_object_name': 'alignment_object_name'
         }
         with self.assertRaisesRegexp(
                 ValueError, '"alignment_object_name" parameter is required, but missing'):
             self.getImpl().run_tophat2_app(self.getContext(), invalidate_input_params)
+
+    def test_run_tophat2_app_se_reads(self):
+        input_params = {
+            'input_ref': self.se_reads_ref,
+            'assembly_or_genome_ref': self.assembly_ref,
+            'workspace_name': self.getWsName(),
+            'alignment_object_name': 'My_Alignment'
+        }
+
+        result = self.getImpl().run_tophat2_app(self.getContext(), input_params)[0]
+
+        self.assertTrue('result_directory' in result)
+        result_files = os.listdir(result['result_directory'])
+        print result_files
+        self.assertTrue('reads_alignment_object_ref' in result)
+
+    def test_run_tophat2_app_pe_reads(self):
+        input_params = {
+            'input_ref': self.pe_reads_ref,
+            'assembly_or_genome_ref': self.assembly_ref,
+            'workspace_name': self.getWsName(),
+            'alignment_object_name': 'My_Alignment',
+            'reads_condition': 'test_condition'
+        }
+
+        result = self.getImpl().run_tophat2_app(self.getContext(), input_params)[0]
+
+        self.assertTrue('result_directory' in result)
+        result_files = os.listdir(result['result_directory'])
+        print result_files
+        self.assertTrue('reads_alignment_object_ref' in result)

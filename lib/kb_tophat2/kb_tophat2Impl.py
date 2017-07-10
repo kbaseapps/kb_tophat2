@@ -24,7 +24,7 @@ class kb_tophat2:
     ######################################### noqa
     VERSION = "1.0.0"
     GIT_URL = "https://github.com/Tianhao-Gu/kb_tophat2.git"
-    GIT_COMMIT_HASH = "dad6896c07b37b33cdc6f6fa28078f727edfd955"
+    GIT_COMMIT_HASH = "0878a8065fede67296a0735bcb80286ed633c806"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
@@ -45,9 +45,9 @@ class kb_tophat2:
         run_tophat2_app: run TopHat2 app
         ref: https://ccb.jhu.edu/software/tophat/manual.shtml
         :param params: instance of type "TopHatInput" (required params:
-           reads_ref: input reads object (Single/Paired_reads, reads_set,
-           sample_set) bowtie_index: indexed genome object ref built using
-           Bowtie2 workspace_name: the name of the workspace it gets saved to
+           input_ref: input reads object (Single/Paired_reads, reads_set,
+           sample_set) assembly_or_genome_ref: ref to Assembly, ContigSet, or
+           Genome workspace_name: the name of the workspace it gets saved to
            alignment_object_name: output Alignment or AlignmentSet object
            name optional params: num_threads: number of processing threads
            read_mismatches: read mismatch cutoff read_gap_length: read gap
@@ -61,13 +61,13 @@ class kb_tophat2:
            alignment preset options (b2-very-fast, b2-fast, b2-sensitive,
            b2-very-sensitive) ref:
            https://ccb.jhu.edu/software/tophat/manual.shtml) -> structure:
-           parameter "reads_ref" of type "obj_ref" (An X/Y/Z style
-           reference), parameter "bowtie_index" of type "obj_ref" (An X/Y/Z
-           style reference), parameter "workspace_name" of String, parameter
-           "alignment_object_name" of String, parameter "num_threads" of
-           Long, parameter "read_mismatches" of Long, parameter
-           "read_gap_length" of Long, parameter "read_edit_dist" of Long,
-           parameter "min_intron_length" of Long, parameter
+           parameter "input_ref" of type "obj_ref" (An X/Y/Z style
+           reference), parameter "assembly_or_genome_ref" of type "obj_ref"
+           (An X/Y/Z style reference), parameter "workspace_name" of String,
+           parameter "alignment_object_name" of String, parameter
+           "num_threads" of Long, parameter "read_mismatches" of Long,
+           parameter "read_gap_length" of Long, parameter "read_edit_dist" of
+           Long, parameter "min_intron_length" of Long, parameter
            "max_intron_length" of Long, parameter "min_anchor_length" of
            Long, parameter "report_secondary_alignments" of type "boolean" (A
            boolean - 0 for false, 1 for true. @range (0, 1)), parameter
