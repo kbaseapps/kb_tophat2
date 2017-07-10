@@ -123,7 +123,7 @@ $params is a kb_tophat2.TopHatInput
 $returnVal is a kb_tophat2.TopHatResult
 TopHatInput is a reference to a hash where the following keys are defined:
 	reads_ref has a value which is a kb_tophat2.obj_ref
-	assembly_or_genome_ref has a value which is a kb_tophat2.obj_ref
+	bowtie_index has a value which is a kb_tophat2.obj_ref
 	workspace_name has a value which is a string
 	alignment_object_name has a value which is a string
 	num_threads has a value which is an int
@@ -133,11 +133,12 @@ TopHatInput is a reference to a hash where the following keys are defined:
 	min_intron_length has a value which is an int
 	max_intron_length has a value which is an int
 	min_anchor_length has a value which is an int
-	report_secondary_alignments has a value which is a string
-	no_coverage_search has a value which is a string
+	report_secondary_alignments has a value which is a kb_tophat2.boolean
+	no_coverage_search has a value which is a kb_tophat2.boolean
 	library_type has a value which is a string
 	preset_options has a value which is a string
 obj_ref is a string
+boolean is an int
 TopHatResult is a reference to a hash where the following keys are defined:
 	result_directory has a value which is a string
 	reads_alignment_object_ref has a value which is a kb_tophat2.obj_ref
@@ -154,7 +155,7 @@ $params is a kb_tophat2.TopHatInput
 $returnVal is a kb_tophat2.TopHatResult
 TopHatInput is a reference to a hash where the following keys are defined:
 	reads_ref has a value which is a kb_tophat2.obj_ref
-	assembly_or_genome_ref has a value which is a kb_tophat2.obj_ref
+	bowtie_index has a value which is a kb_tophat2.obj_ref
 	workspace_name has a value which is a string
 	alignment_object_name has a value which is a string
 	num_threads has a value which is an int
@@ -164,11 +165,12 @@ TopHatInput is a reference to a hash where the following keys are defined:
 	min_intron_length has a value which is an int
 	max_intron_length has a value which is an int
 	min_anchor_length has a value which is an int
-	report_secondary_alignments has a value which is a string
-	no_coverage_search has a value which is a string
+	report_secondary_alignments has a value which is a kb_tophat2.boolean
+	no_coverage_search has a value which is a kb_tophat2.boolean
 	library_type has a value which is a string
 	preset_options has a value which is a string
 obj_ref is a string
+boolean is an int
 TopHatResult is a reference to a hash where the following keys are defined:
 	result_directory has a value which is a string
 	reads_alignment_object_ref has a value which is a kb_tophat2.obj_ref
@@ -396,7 +398,7 @@ a string
 
 required params:
 reads_ref: input reads object (Single/Paired_reads, reads_set, sample_set)
-assembly_or_genome_ref: input reference Assembly or Genome object reference
+bowtie_index: indexed genome object ref built using Bowtie2
 workspace_name: the name of the workspace it gets saved to
 alignment_object_name: output Alignment or AlignmentSet object name
 
@@ -423,7 +425,7 @@ ref: https://ccb.jhu.edu/software/tophat/manual.shtml
 <pre>
 a reference to a hash where the following keys are defined:
 reads_ref has a value which is a kb_tophat2.obj_ref
-assembly_or_genome_ref has a value which is a kb_tophat2.obj_ref
+bowtie_index has a value which is a kb_tophat2.obj_ref
 workspace_name has a value which is a string
 alignment_object_name has a value which is a string
 num_threads has a value which is an int
@@ -433,8 +435,8 @@ read_edit_dist has a value which is an int
 min_intron_length has a value which is an int
 max_intron_length has a value which is an int
 min_anchor_length has a value which is an int
-report_secondary_alignments has a value which is a string
-no_coverage_search has a value which is a string
+report_secondary_alignments has a value which is a kb_tophat2.boolean
+no_coverage_search has a value which is a kb_tophat2.boolean
 library_type has a value which is a string
 preset_options has a value which is a string
 
@@ -446,7 +448,7 @@ preset_options has a value which is a string
 
 a reference to a hash where the following keys are defined:
 reads_ref has a value which is a kb_tophat2.obj_ref
-assembly_or_genome_ref has a value which is a kb_tophat2.obj_ref
+bowtie_index has a value which is a kb_tophat2.obj_ref
 workspace_name has a value which is a string
 alignment_object_name has a value which is a string
 num_threads has a value which is an int
@@ -456,8 +458,8 @@ read_edit_dist has a value which is an int
 min_intron_length has a value which is an int
 max_intron_length has a value which is an int
 min_anchor_length has a value which is an int
-report_secondary_alignments has a value which is a string
-no_coverage_search has a value which is a string
+report_secondary_alignments has a value which is a kb_tophat2.boolean
+no_coverage_search has a value which is a kb_tophat2.boolean
 library_type has a value which is a string
 preset_options has a value which is a string
 

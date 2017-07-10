@@ -16,7 +16,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  * <pre>
  * required params:
  * reads_ref: input reads object (Single/Paired_reads, reads_set, sample_set)
- * assembly_or_genome_ref: input reference Assembly or Genome object reference
+ * bowtie_index: indexed genome object ref built using Bowtie2
  * workspace_name: the name of the workspace it gets saved to
  * alignment_object_name: output Alignment or AlignmentSet object name
  * optional params:
@@ -39,7 +39,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @Generated("com.googlecode.jsonschema2pojo")
 @JsonPropertyOrder({
     "reads_ref",
-    "assembly_or_genome_ref",
+    "bowtie_index",
     "workspace_name",
     "alignment_object_name",
     "num_threads",
@@ -58,8 +58,8 @@ public class TopHatInput {
 
     @JsonProperty("reads_ref")
     private String readsRef;
-    @JsonProperty("assembly_or_genome_ref")
-    private String assemblyOrGenomeRef;
+    @JsonProperty("bowtie_index")
+    private String bowtieIndex;
     @JsonProperty("workspace_name")
     private String workspaceName;
     @JsonProperty("alignment_object_name")
@@ -79,9 +79,9 @@ public class TopHatInput {
     @JsonProperty("min_anchor_length")
     private Long minAnchorLength;
     @JsonProperty("report_secondary_alignments")
-    private String reportSecondaryAlignments;
+    private Long reportSecondaryAlignments;
     @JsonProperty("no_coverage_search")
-    private String noCoverageSearch;
+    private Long noCoverageSearch;
     @JsonProperty("library_type")
     private String libraryType;
     @JsonProperty("preset_options")
@@ -103,18 +103,18 @@ public class TopHatInput {
         return this;
     }
 
-    @JsonProperty("assembly_or_genome_ref")
-    public String getAssemblyOrGenomeRef() {
-        return assemblyOrGenomeRef;
+    @JsonProperty("bowtie_index")
+    public String getBowtieIndex() {
+        return bowtieIndex;
     }
 
-    @JsonProperty("assembly_or_genome_ref")
-    public void setAssemblyOrGenomeRef(String assemblyOrGenomeRef) {
-        this.assemblyOrGenomeRef = assemblyOrGenomeRef;
+    @JsonProperty("bowtie_index")
+    public void setBowtieIndex(String bowtieIndex) {
+        this.bowtieIndex = bowtieIndex;
     }
 
-    public TopHatInput withAssemblyOrGenomeRef(String assemblyOrGenomeRef) {
-        this.assemblyOrGenomeRef = assemblyOrGenomeRef;
+    public TopHatInput withBowtieIndex(String bowtieIndex) {
+        this.bowtieIndex = bowtieIndex;
         return this;
     }
 
@@ -254,31 +254,31 @@ public class TopHatInput {
     }
 
     @JsonProperty("report_secondary_alignments")
-    public String getReportSecondaryAlignments() {
+    public Long getReportSecondaryAlignments() {
         return reportSecondaryAlignments;
     }
 
     @JsonProperty("report_secondary_alignments")
-    public void setReportSecondaryAlignments(String reportSecondaryAlignments) {
+    public void setReportSecondaryAlignments(Long reportSecondaryAlignments) {
         this.reportSecondaryAlignments = reportSecondaryAlignments;
     }
 
-    public TopHatInput withReportSecondaryAlignments(String reportSecondaryAlignments) {
+    public TopHatInput withReportSecondaryAlignments(Long reportSecondaryAlignments) {
         this.reportSecondaryAlignments = reportSecondaryAlignments;
         return this;
     }
 
     @JsonProperty("no_coverage_search")
-    public String getNoCoverageSearch() {
+    public Long getNoCoverageSearch() {
         return noCoverageSearch;
     }
 
     @JsonProperty("no_coverage_search")
-    public void setNoCoverageSearch(String noCoverageSearch) {
+    public void setNoCoverageSearch(Long noCoverageSearch) {
         this.noCoverageSearch = noCoverageSearch;
     }
 
-    public TopHatInput withNoCoverageSearch(String noCoverageSearch) {
+    public TopHatInput withNoCoverageSearch(Long noCoverageSearch) {
         this.noCoverageSearch = noCoverageSearch;
         return this;
     }
@@ -325,7 +325,7 @@ public class TopHatInput {
 
     @Override
     public String toString() {
-        return ((((((((((((((((((((((((((((((((("TopHatInput"+" [readsRef=")+ readsRef)+", assemblyOrGenomeRef=")+ assemblyOrGenomeRef)+", workspaceName=")+ workspaceName)+", alignmentObjectName=")+ alignmentObjectName)+", numThreads=")+ numThreads)+", readMismatches=")+ readMismatches)+", readGapLength=")+ readGapLength)+", readEditDist=")+ readEditDist)+", minIntronLength=")+ minIntronLength)+", maxIntronLength=")+ maxIntronLength)+", minAnchorLength=")+ minAnchorLength)+", reportSecondaryAlignments=")+ reportSecondaryAlignments)+", noCoverageSearch=")+ noCoverageSearch)+", libraryType=")+ libraryType)+", presetOptions=")+ presetOptions)+", additionalProperties=")+ additionalProperties)+"]");
+        return ((((((((((((((((((((((((((((((((("TopHatInput"+" [readsRef=")+ readsRef)+", bowtieIndex=")+ bowtieIndex)+", workspaceName=")+ workspaceName)+", alignmentObjectName=")+ alignmentObjectName)+", numThreads=")+ numThreads)+", readMismatches=")+ readMismatches)+", readGapLength=")+ readGapLength)+", readEditDist=")+ readEditDist)+", minIntronLength=")+ minIntronLength)+", maxIntronLength=")+ maxIntronLength)+", minAnchorLength=")+ minAnchorLength)+", reportSecondaryAlignments=")+ reportSecondaryAlignments)+", noCoverageSearch=")+ noCoverageSearch)+", libraryType=")+ libraryType)+", presetOptions=")+ presetOptions)+", additionalProperties=")+ additionalProperties)+"]");
     }
 
 }
