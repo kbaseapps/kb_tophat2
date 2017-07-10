@@ -5,6 +5,7 @@ import json  # noqa: F401
 import time
 import requests  # noqa: F401
 import shutil
+import re
 
 from os import environ
 try:
@@ -15,6 +16,7 @@ except:
 from pprint import pprint  # noqa: F401
 
 from biokbase.workspace.client import Workspace as workspaceService
+from Workspace.WorkspaceClient import Workspace as Workspace
 from kb_tophat2.kb_tophat2Impl import kb_tophat2
 from kb_tophat2.kb_tophat2Server import MethodContext
 from kb_tophat2.authclient import KBaseAuth as _KBaseAuth
@@ -51,6 +53,7 @@ class kb_tophat2Test(unittest.TestCase):
                         'authenticated': 1})
         cls.wsURL = cls.cfg['workspace-url']
         cls.wsClient = workspaceService(cls.wsURL)
+        cls.ws = Workspace(cls.wsURL, token=token)
         cls.serviceImpl = kb_tophat2(cls.cfg)
         cls.scratch = cls.cfg['scratch']
         cls.callback_url = os.environ['SDK_CALLBACK_URL']
@@ -168,7 +171,7 @@ class kb_tophat2Test(unittest.TestCase):
             'assembly_or_genome_ref': self.assembly_ref,
             'workspace_name': self.getWsName(),
             'alignment_object_name': 'My_Alignment',
-            'reads_condition': "unspecified",
+            'reads_condition': 'test_condition',
             'read_mismatches': 2,
             'read_gap_length': 2,
             'read_edit_dist': 2,
@@ -186,7 +189,17 @@ class kb_tophat2Test(unittest.TestCase):
         self.assertTrue('result_directory' in result)
         result_files = os.listdir(result['result_directory'])
         print result_files
+        self.assertTrue(any(re.match('bowtie2_index_*', file) for file in result_files))
+        self.assertTrue(any(re.match('reads_file_*', file) for file in result_files))
+        self.assertTrue(any(re.match('tophat2_result_*', file) for file in result_files))
         self.assertTrue('reads_alignment_object_ref' in result)
+        alignment_data = self.ws.get_objects2({'objects': 
+                                              [{'ref': result.get('reads_alignment_object_ref')}]})['data'][0]['data']
+        self.assertEqual(alignment_data.get('aligned_using'), 'tophat2')
+        self.assertEqual(alignment_data.get('condition'), 'test_condition')
+        self.assertEqual(alignment_data.get('read_sample_id'), self.se_reads_ref)
+        self.assertEqual(alignment_data.get('genome_id'), self.assembly_ref)
+        self.assertEqual(alignment_data.get('library_type'), 'single')
 
     def test_run_tophat2_app_pe_reads(self):
         input_params = {
@@ -194,7 +207,7 @@ class kb_tophat2Test(unittest.TestCase):
             'assembly_or_genome_ref': self.assembly_ref,
             'workspace_name': self.getWsName(),
             'alignment_object_name': 'My_Alignment',
-            'reads_condition': "unspecified",
+            'reads_condition': 'test_condition',
             'read_mismatches': 2,
             'read_gap_length': 2,
             'read_edit_dist': 2,
@@ -212,4 +225,14 @@ class kb_tophat2Test(unittest.TestCase):
         self.assertTrue('result_directory' in result)
         result_files = os.listdir(result['result_directory'])
         print result_files
+        self.assertTrue(any(re.match('bowtie2_index_*', file) for file in result_files))
+        self.assertTrue(any(re.match('reads_file_*', file) for file in result_files))
+        self.assertTrue(any(re.match('tophat2_result_*', file) for file in result_files))
         self.assertTrue('reads_alignment_object_ref' in result)
+        alignment_data = self.ws.get_objects2({'objects': 
+                                              [{'ref': result.get('reads_alignment_object_ref')}]})['data'][0]['data']
+        self.assertEqual(alignment_data.get('aligned_using'), 'tophat2')
+        self.assertEqual(alignment_data.get('condition'), 'test_condition')
+        self.assertEqual(alignment_data.get('read_sample_id'), self.pe_reads_ref)
+        self.assertEqual(alignment_data.get('genome_id'), self.assembly_ref)
+        self.assertEqual(alignment_data.get('library_type'), 'paired')

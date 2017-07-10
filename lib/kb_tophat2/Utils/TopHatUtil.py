@@ -301,7 +301,13 @@ class TopHatUtil:
         elif input_object_info['run_mode'] == 'sample_set':
             reads_alignment_object_ref = self._process_set_reads_library()
 
+        report_output = self._generate_report(reads_alignment_object_ref,
+                                              result_directory,
+                                              params.get('workspace_name'))
+
         returnVal = {'result_directory': result_directory,
                      'reads_alignment_object_ref': reads_alignment_object_ref}
+
+        returnVal.update(report_output)
 
         return returnVal
