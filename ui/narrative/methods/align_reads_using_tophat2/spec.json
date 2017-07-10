@@ -1,0 +1,313 @@
+{
+    "ver": "1.0.0",
+    "authors": [
+        "tgu2"
+    ],
+    "contact": "",
+    "categories": ["active","expression","sequence"],
+    "widgets": {
+        "input": null,
+        "output": "kbaseRNASeqPieNew"
+    },
+    "parameters": [ 
+        {
+            "id" : "reads_ref",
+            "optional" : false,
+            "advanced" : false,
+            "allow_multiple" : false,
+            "default_values" : [ "" ],
+            "field_type" : "text",
+            "text_options" : 
+                {
+                    "valid_ws_types" : ["KBaseSets.ReadsSet", "KBaseRNASeq.RNASeqSampleSet" , "KBaseAssembly.SingleEndLibrary", "KBaseAssembly.PairedEndLibrary", "KBaseFile.SingleEndLibrary", "KBaseFile.PairedEndLibrary"]
+                }
+        },
+        {
+            "id" : "bowtie_index",
+            "optional" : false,
+            "advanced" : false,
+            "allow_multiple" : false,
+            "default_values" : [ "" ],
+            "field_type" : "text",
+            "text_options" : 
+            {
+                "valid_ws_types" : ["KBaseRNASeq.Bowtie2Indexes" ]
+            }
+        }, 
+        {
+            "id" : "alignment_object_name",
+            "optional" : false,
+            "advanced" : false,
+            "allow_multiple" : false,
+            "default_values" : [ "" ],
+            "field_type" : "text",
+            "text_options" : 
+            {
+                "valid_ws_types" : ["KBaseRNASeq.RNASeqAlignment", "KBaseRNASeq.RNASeqAlignmentSet" ],
+                "is_output_name" : true
+            }
+        },
+        {
+            "id" : "read_mismatches",
+            "optional" : true,
+            "advanced" : true,
+            "allow_multiple" : false,
+            "default_values" : [ "2" ],
+            "field_type" : "text",
+            "text_options" : 
+            {
+                "validate_as" : "int"
+            }
+        }, 
+        {
+            "id" : "read_gap_length",
+            "optional" : true,
+            "advanced" : true,
+            "allow_multiple" : false,
+            "default_values" : [ "2" ],
+            "field_type" : "text",
+            "text_options" : 
+            {
+                "validate_as" : "int"
+            }
+        }, 
+        {
+            "id" : "read_edit_dist",
+            "optional" : true,
+            "advanced" : true,
+            "allow_multiple" : false,
+            "default_values" : [ "2" ],
+            "field_type" : "text",
+            "text_options" : 
+            {
+                "validate_as" : "int"
+            }
+        }, 
+        {
+            "id" : "min_intron_length",
+            "optional" : true,
+            "advanced" : true,
+            "allow_multiple" : false,
+            "default_values" : [ "70" ],
+            "field_type" : "text",
+            "text_options" : 
+            {
+                "validate_as" : "int"
+            }
+        }, 
+        {
+            "id" : "max_intron_length",
+            "optional" : true,
+            "advanced" : true,
+            "allow_multiple" : false,
+            "default_values" : [ "500000" ],
+            "field_type" : "text",
+            "text_options" : 
+            {
+                "validate_as" : "int"
+            }
+        }, 
+        {
+            "id" : "min_anchor_length",
+            "optional" : true,
+            "advanced" : true,
+            "allow_multiple" : false,
+            "default_values" : [ "8" ],
+            "field_type" : "text",
+            "text_options" : 
+            {
+                "validate_as" : "int"
+            }
+        }, 
+        {
+            "id" : "report_secondary_alignments",
+            "optional": true,
+            "advanced": true,
+            "allow_multiple": false,
+            "default_values": [""],
+            "field_type" : "checkbox",
+            "checkbox_options": 
+            {
+                "checked_value": 1,
+                "unchecked_value": 0
+            }
+        }, 
+        {
+            "id" : "no_coverage_search",
+            "optional": true,
+            "advanced": true,
+            "allow_multiple": false,
+            "default_values": [""],
+            "field_type" : "checkbox",
+            "checkbox_options": 
+            {
+                "checked_value": 1,
+                "unchecked_value": 0
+            }
+        }, 
+        {
+            "id" : "library_type",
+            "optional" : true,
+            "advanced" : true,
+            "allow_multiple" : false,
+            "default_values" : [ "" ],
+            "field_type" : "dropdown",
+            "dropdown_options":{
+                "options": [
+                    {
+                      "value": "fr-unstranded",
+                      "display": "fr-unstranded",
+                      "id": "fr-unstranded",
+                      "ui_name": "fr-unstranded"
+                    },
+                    {
+                      "value": "fr-firststrand",
+                      "display": "fr-firststrand",
+                      "id": "fr-firststrand",
+                      "ui_name": "fr-firststrand"
+                    },
+                    {
+                      "value": "fr-secondstrand",
+                      "display": "fr-secondstrand",
+                      "id": "fr-secondstrand",
+                      "ui_name": "fr-secondstrand"
+                    }
+                ]
+            }
+        }, 
+        {
+            "id" : "preset_options",
+            "optional" : true,
+            "advanced" : true,
+            "allow_multiple" : false,
+            "default_values" : [ "" ],
+            "field_type" : "dropdown",
+            "dropdown_options":{
+                "options": [
+                    {
+                      "value": "b2-very-fast",
+                      "display": "b2-very-fast",
+                      "id": "b2-very-fast",
+                      "ui_name": "b2-very-fast"
+                    },
+                    {
+                      "value": "b2-fast",
+                      "display": "b2-fast",
+                      "id": "b2-fast",
+                      "ui_name": "b2-fast"
+                    },
+                    {
+                      "value": "b2-sensitive",
+                      "display": "b2-sensitive",
+                      "id": "b2-sensitive",
+                      "ui_name": "b2-sensitive"
+                    },
+                    {
+                      "value": "b2-very-sensitive",
+                      "display": "b2-very-sensitive",
+                      "id": "b2-very-sensitive",
+                      "ui_name": "b2-very-sensitive"
+                    }
+                ]
+            }
+        }
+    ],
+    "behavior": {
+        "service-mapping": {
+            "url": "",
+            "name": "kb_tophat2",
+            "method": "run_tophat2_app",
+            "input_mapping": [
+                {
+                    "narrative_system_variable": "workspace",
+                    "target_property" : "workspace_name"
+                },
+                {
+                    "input_parameter" : "reads_ref",
+                    "target_type_transform": "resolved-ref",
+                    "target_property" : "reads_ref"
+                },
+                {
+                    "input_parameter" : "bowtie_index",
+                    "target_type_transform": "resolved-ref",
+                    "target_property" : "bowtie_index"
+                },
+                {
+                    "input_parameter" : "alignment_object_name",
+                    "target_property" : "alignment_object_name"
+                },
+                {
+                    "constant_value"  : 2,
+                    "target_property" : "num_threads"
+                },  
+                {
+                    "input_parameter" : "read_mismatches",
+                    "target_property" : "read_mismatches"
+                },
+                {
+                    "input_parameter" : "read_gap_length",
+                    "target_property" : "read_gap_length"
+                },
+                {
+                    "input_parameter" : "read_edit_dist",
+                    "target_property" : "read_edit_dist"
+                },
+                {
+                    "input_parameter" : "min_intron_length",
+                    "target_property" : "min_intron_length"
+                },
+                {
+                    "input_parameter" : "max_intron_length",
+                    "target_property" : "max_intron_length"
+                },
+                {
+                    "input_parameter" : "min_anchor_length",
+                    "target_property" : "min_anchor_length"
+                },
+                {
+                    "input_parameter" : "report_secondary_alignments",
+                    "target_property" : "report_secondary_alignments"
+                },
+                {
+                    "input_parameter" : "no_coverage_search",
+                    "target_property" : "no_coverage_search"
+                },
+                {
+                    "input_parameter" : "library_type",
+                    "target_property" : "library_type"
+                },
+                {
+                    "input_parameter" : "preset_options",
+                    "target_property" : "preset_options"
+                }
+            ],
+            "output_mapping": [
+                {
+                  "narrative_system_variable": "workspace",
+                  "target_property": "wsName"
+                },
+                {
+                  "service_method_output_path": [0, "result_directory"],
+                  "target_property": "result_directory"
+                },
+                {
+                 "service_method_output_path": [0,"reads_alignment_object_ref"],
+                 "target_property": "reads_alignment_object_ref"
+                },
+                {
+                  "service_method_output_path": [0, "report_name"],
+                  "target_property": "report_name"
+                },
+                {
+                  "service_method_output_path": [0, "report_ref"],
+                  "target_property": "report_ref"
+                },
+                {
+                  "constant_value": "16",
+                  "target_property": "report_window_line_height"
+                }
+            ]
+        }
+    },
+    "job_id_output_field": "docker"
+}
