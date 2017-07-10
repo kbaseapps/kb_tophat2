@@ -6,8 +6,8 @@
     "contact": "",
     "categories": ["active","expression","sequence"],
     "widgets": {
-        "input": null,
-        "output": "kbaseRNASeqPieNew"
+        "input": "kbaseNarrativeMethodInput",
+        "output": "no-display"
     },
     "parameters": [ 
         {
