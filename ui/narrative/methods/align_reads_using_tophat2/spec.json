@@ -245,6 +245,10 @@
                     "target_property" : "alignment_object_name"
                 },
                 {
+                    "input_parameter" : "reads_condition",
+                    "target_property" : "reads_condition"
+                },
+                {
                     "constant_value"  : 2,
                     "target_property" : "num_threads"
                 },  
