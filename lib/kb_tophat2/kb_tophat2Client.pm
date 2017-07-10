@@ -122,8 +122,8 @@ sub new
 $params is a kb_tophat2.TopHatInput
 $returnVal is a kb_tophat2.TopHatResult
 TopHatInput is a reference to a hash where the following keys are defined:
-	reads_ref has a value which is a kb_tophat2.obj_ref
-	bowtie_index has a value which is a kb_tophat2.obj_ref
+	input_ref has a value which is a kb_tophat2.obj_ref
+	assembly_or_genome_ref has a value which is a kb_tophat2.obj_ref
 	workspace_name has a value which is a string
 	alignment_object_name has a value which is a string
 	num_threads has a value which is an int
@@ -154,8 +154,8 @@ TopHatResult is a reference to a hash where the following keys are defined:
 $params is a kb_tophat2.TopHatInput
 $returnVal is a kb_tophat2.TopHatResult
 TopHatInput is a reference to a hash where the following keys are defined:
-	reads_ref has a value which is a kb_tophat2.obj_ref
-	bowtie_index has a value which is a kb_tophat2.obj_ref
+	input_ref has a value which is a kb_tophat2.obj_ref
+	assembly_or_genome_ref has a value which is a kb_tophat2.obj_ref
 	workspace_name has a value which is a string
 	alignment_object_name has a value which is a string
 	num_threads has a value which is an int
@@ -397,8 +397,8 @@ a string
 =item Description
 
 required params:
-reads_ref: input reads object (Single/Paired_reads, reads_set, sample_set)
-bowtie_index: indexed genome object ref built using Bowtie2
+input_ref: input reads object (Single/Paired_reads, reads_set, sample_set)
+assembly_or_genome_ref: ref to Assembly, ContigSet, or Genome
 workspace_name: the name of the workspace it gets saved to
 alignment_object_name: output Alignment or AlignmentSet object name
 
@@ -424,8 +424,8 @@ ref: https://ccb.jhu.edu/software/tophat/manual.shtml
 
 <pre>
 a reference to a hash where the following keys are defined:
-reads_ref has a value which is a kb_tophat2.obj_ref
-bowtie_index has a value which is a kb_tophat2.obj_ref
+input_ref has a value which is a kb_tophat2.obj_ref
+assembly_or_genome_ref has a value which is a kb_tophat2.obj_ref
 workspace_name has a value which is a string
 alignment_object_name has a value which is a string
 num_threads has a value which is an int
@@ -447,8 +447,8 @@ preset_options has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-reads_ref has a value which is a kb_tophat2.obj_ref
-bowtie_index has a value which is a kb_tophat2.obj_ref
+input_ref has a value which is a kb_tophat2.obj_ref
+assembly_or_genome_ref has a value which is a kb_tophat2.obj_ref
 workspace_name has a value which is a string
 alignment_object_name has a value which is a string
 num_threads has a value which is an int

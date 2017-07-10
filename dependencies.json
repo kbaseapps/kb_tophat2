@@ -1,4 +1,20 @@
 [ {
+  "module_name" : "AssemblyUtil",
+  "type" : "sdk",
+  "version_tag" : "release"
+}, {
+  "module_name" : "kb_Bowtie2",
+  "type" : "sdk",
+  "version_tag" : "release"
+}, {
+  "module_name" : "ReadsAlignmentUtils",
+  "type" : "sdk",
+  "version_tag" : "release"
+}, {
+  "module_name" : "ReadsUtils",
+  "type" : "sdk",
+  "version_tag" : "release"
+}, {
   "module_name" : "Workspace",
   "type" : "core",
   "file_path" : "https://raw.githubusercontent.com/kbase/workspace_deluxe/master/workspace.spec"

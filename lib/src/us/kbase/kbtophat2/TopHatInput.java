@@ -15,8 +15,8 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  * <p>Original spec-file type: TopHatInput</p>
  * <pre>
  * required params:
- * reads_ref: input reads object (Single/Paired_reads, reads_set, sample_set)
- * bowtie_index: indexed genome object ref built using Bowtie2
+ * input_ref: input reads object (Single/Paired_reads, reads_set, sample_set)
+ * assembly_or_genome_ref: ref to Assembly, ContigSet, or Genome
  * workspace_name: the name of the workspace it gets saved to
  * alignment_object_name: output Alignment or AlignmentSet object name
  * optional params:
@@ -38,8 +38,8 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("com.googlecode.jsonschema2pojo")
 @JsonPropertyOrder({
-    "reads_ref",
-    "bowtie_index",
+    "input_ref",
+    "assembly_or_genome_ref",
     "workspace_name",
     "alignment_object_name",
     "num_threads",
@@ -56,10 +56,10 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 })
 public class TopHatInput {
 
-    @JsonProperty("reads_ref")
-    private String readsRef;
-    @JsonProperty("bowtie_index")
-    private String bowtieIndex;
+    @JsonProperty("input_ref")
+    private String inputRef;
+    @JsonProperty("assembly_or_genome_ref")
+    private String assemblyOrGenomeRef;
     @JsonProperty("workspace_name")
     private String workspaceName;
     @JsonProperty("alignment_object_name")
@@ -88,33 +88,33 @@ public class TopHatInput {
     private String presetOptions;
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
-    @JsonProperty("reads_ref")
-    public String getReadsRef() {
-        return readsRef;
+    @JsonProperty("input_ref")
+    public String getInputRef() {
+        return inputRef;
     }
 
-    @JsonProperty("reads_ref")
-    public void setReadsRef(String readsRef) {
-        this.readsRef = readsRef;
+    @JsonProperty("input_ref")
+    public void setInputRef(String inputRef) {
+        this.inputRef = inputRef;
     }
 
-    public TopHatInput withReadsRef(String readsRef) {
-        this.readsRef = readsRef;
+    public TopHatInput withInputRef(String inputRef) {
+        this.inputRef = inputRef;
         return this;
     }
 
-    @JsonProperty("bowtie_index")
-    public String getBowtieIndex() {
-        return bowtieIndex;
+    @JsonProperty("assembly_or_genome_ref")
+    public String getAssemblyOrGenomeRef() {
+        return assemblyOrGenomeRef;
     }
 
-    @JsonProperty("bowtie_index")
-    public void setBowtieIndex(String bowtieIndex) {
-        this.bowtieIndex = bowtieIndex;
+    @JsonProperty("assembly_or_genome_ref")
+    public void setAssemblyOrGenomeRef(String assemblyOrGenomeRef) {
+        this.assemblyOrGenomeRef = assemblyOrGenomeRef;
     }
 
-    public TopHatInput withBowtieIndex(String bowtieIndex) {
-        this.bowtieIndex = bowtieIndex;
+    public TopHatInput withAssemblyOrGenomeRef(String assemblyOrGenomeRef) {
+        this.assemblyOrGenomeRef = assemblyOrGenomeRef;
         return this;
     }
 
@@ -325,7 +325,7 @@ public class TopHatInput {
 
     @Override
     public String toString() {
-        return ((((((((((((((((((((((((((((((((("TopHatInput"+" [readsRef=")+ readsRef)+", bowtieIndex=")+ bowtieIndex)+", workspaceName=")+ workspaceName)+", alignmentObjectName=")+ alignmentObjectName)+", numThreads=")+ numThreads)+", readMismatches=")+ readMismatches)+", readGapLength=")+ readGapLength)+", readEditDist=")+ readEditDist)+", minIntronLength=")+ minIntronLength)+", maxIntronLength=")+ maxIntronLength)+", minAnchorLength=")+ minAnchorLength)+", reportSecondaryAlignments=")+ reportSecondaryAlignments)+", noCoverageSearch=")+ noCoverageSearch)+", libraryType=")+ libraryType)+", presetOptions=")+ presetOptions)+", additionalProperties=")+ additionalProperties)+"]");
+        return ((((((((((((((((((((((((((((((((("TopHatInput"+" [inputRef=")+ inputRef)+", assemblyOrGenomeRef=")+ assemblyOrGenomeRef)+", workspaceName=")+ workspaceName)+", alignmentObjectName=")+ alignmentObjectName)+", numThreads=")+ numThreads)+", readMismatches=")+ readMismatches)+", readGapLength=")+ readGapLength)+", readEditDist=")+ readEditDist)+", minIntronLength=")+ minIntronLength)+", maxIntronLength=")+ maxIntronLength)+", minAnchorLength=")+ minAnchorLength)+", reportSecondaryAlignments=")+ reportSecondaryAlignments)+", noCoverageSearch=")+ noCoverageSearch)+", libraryType=")+ libraryType)+", presetOptions=")+ presetOptions)+", additionalProperties=")+ additionalProperties)+"]");
     }
 
 }

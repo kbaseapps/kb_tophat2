@@ -11,7 +11,7 @@
     },
     "parameters": [ 
         {
-            "id" : "reads_ref",
+            "id" : "input_ref",
             "optional" : false,
             "advanced" : false,
             "allow_multiple" : false,
@@ -23,7 +23,7 @@
                 }
         },
         {
-            "id" : "bowtie_index",
+            "id" : "assembly_or_genome_ref",
             "optional" : false,
             "advanced" : false,
             "allow_multiple" : false,
@@ -31,7 +31,7 @@
             "field_type" : "text",
             "text_options" : 
             {
-                "valid_ws_types" : ["KBaseRNASeq.Bowtie2Indexes" ]
+                "valid_ws_types" : ["KBaseGenomes.Genome", "KBaseGenomeAnnotations.Assembly", "KBaseGenomes.ContigSet" ]
             }
         }, 
         {
@@ -46,6 +46,14 @@
                 "valid_ws_types" : ["KBaseRNASeq.RNASeqAlignment", "KBaseRNASeq.RNASeqAlignmentSet" ],
                 "is_output_name" : true
             }
+        },
+        {
+            "id" : "reads_condition",
+            "optional" : true,
+            "advanced" : false,
+            "allow_multiple" : false,
+            "default_values" : [ "unspecified" ],
+            "field_type" : "text"
         },
         {
             "id" : "read_mismatches",
@@ -223,14 +231,14 @@
                     "target_property" : "workspace_name"
                 },
                 {
-                    "input_parameter" : "reads_ref",
+                    "input_parameter" : "input_ref",
                     "target_type_transform": "resolved-ref",
-                    "target_property" : "reads_ref"
+                    "target_property" : "input_ref"
                 },
                 {
-                    "input_parameter" : "bowtie_index",
+                    "input_parameter" : "assembly_or_genome_ref",
                     "target_type_transform": "resolved-ref",
-                    "target_property" : "bowtie_index"
+                    "target_property" : "assembly_or_genome_ref"
                 },
                 {
                     "input_parameter" : "alignment_object_name",
