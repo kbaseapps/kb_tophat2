@@ -36,11 +36,16 @@ parameters :
             Assembly or Genome
         short-hint : |
             Select the assembly or genome on which to align to
-    alignment_object_name :
+    alignment_suffix :
         ui-name : |
-            Alignment Object Name
+            Alignment Name Suffix
         short-hint : |
-            Provide a name for the output reads alignment or reads alignment set
+            Suffix append to Reads object name to form Alignment name
+    alignment_set_suffix :
+        ui-name : |
+            AlignmentSet Name Suffix
+        short-hint : |
+            Suffix append to Set object name to form AlignmentSet name
     read_mismatches :
         ui-name : |
             Read Mismatch Cutoff

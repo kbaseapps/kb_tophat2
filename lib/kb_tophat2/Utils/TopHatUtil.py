@@ -12,6 +12,8 @@ from kb_Bowtie2.kb_Bowtie2Client import kb_Bowtie2
 from ReadsAlignmentUtils.ReadsAlignmentUtilsClient import ReadsAlignmentUtils
 from ReadsUtils.ReadsUtilsClient import ReadsUtils
 from KBaseReport.KBaseReportClient import KBaseReport
+from SetAPI.SetAPIServiceClient import SetAPI
+from DataFileUtil.DataFileUtilClient import DataFileUtil
 
 
 def log(message, prefix_newline=False):
@@ -61,7 +63,7 @@ class TopHatUtil:
 
         # check for required parameters
         for p in ['input_ref', 'assembly_or_genome_ref', 'workspace_name', 
-                  'alignment_object_name']:
+                  'alignment_suffix']:
             if p not in params:
                 raise ValueError('"{}" parameter is required, but missing'.format(p))
 
@@ -112,6 +114,7 @@ class TopHatUtil:
         """
 
         info = self.ws.get_object_info3({'objects': [{'ref': input_ref}]})['infos'][0]
+
         obj_type = self._get_type_from_obj_info(info)
 
         if obj_type in ['KBaseAssembly.PairedEndLibrary', 'KBaseAssembly.SingleEndLibrary',
@@ -209,23 +212,96 @@ class TopHatUtil:
 
         return reads_alignment_object_ref
 
+    def _generate_alignment_set_data(self, reads_alignment_object_refs, sampleset_id):
+        """
+        _generate_alignment_set_data: generate AlignmentSet data from alignment objects
+        """
+        alignment_set_data = {}
+        mapped_alignments_ids = []
+        mapped_rnaseq_alignments = []
+        read_sample_ids = []
+        sample_alignments = []
+
+        for reads_alignment_object_ref in reads_alignment_object_refs:
+            alignment_data = self.ws.get_objects2({'objects': 
+                                                  [{'ref':
+                                                   reads_alignment_object_ref}]})['data'][0]['data']
+            reads_ref = alignment_data.get('read_sample_id')
+            read_sample_ids.append(reads_ref)
+            sample_alignments.append(reads_alignment_object_ref)
+
+            alignment_name = self.ws.get_object_info3({'objects': 
+                                                      [{'ref': 
+                                                       reads_alignment_object_ref}]})['infos'][0][1]
+
+            reads_name = self.ws.get_object_info3({'objects': [{'ref': reads_ref}]})['infos'][0][1]
+
+            mapped_alignments_ids.append({reads_ref: reads_alignment_object_ref})
+            mapped_rnaseq_alignments.append({reads_name: alignment_name})
+
+            genome_id = alignment_data.get('genome_id')
+
+            if not alignment_set_data.get('genome_id'):
+                alignment_set_data.update({'genome_id': genome_id})
+
+        alignment_set_data.update({'mapped_alignments_ids': mapped_alignments_ids})
+        alignment_set_data.update({'mapped_rnaseq_alignments': mapped_rnaseq_alignments})
+        alignment_set_data.update({'read_sample_ids': read_sample_ids})
+        alignment_set_data.update({'sample_alignments': sample_alignments})
+        alignment_set_data.update({'sampleset_id': sampleset_id})
+
+        return alignment_set_data
+
+    def _save_alignment_set(self, reads_alignment_object_refs, workspace_name, alignment_set_name,
+                            sampleset_id):
+        """
+        _save_alignment_set: upload AlignmentSet object
+        """
+
+        log('starting saving ReadsAlignmentSet object')
+
+        if isinstance(workspace_name, int) or workspace_name.isdigit():
+            workspace_id = workspace_name
+        else:
+            workspace_id = self.dfu.ws_name_to_id(workspace_name)
+
+        object_type = 'KBaseRNASeq.RNASeqAlignmentSet'
+
+        alignment_set_data = self._generate_alignment_set_data(reads_alignment_object_refs, 
+                                                               sampleset_id)
+
+        save_object_params = {
+            'id': workspace_id,
+            'objects': [{'type': object_type,
+                         'data': alignment_set_data,
+                         'name': alignment_set_name}]
+        }
+
+        dfu_oi = self.dfu.save_objects(save_object_params)[0]
+        alignment_set_object_ref = str(dfu_oi[6]) + '/' + str(dfu_oi[0]) + '/' + str(dfu_oi[4])
+
+        return alignment_set_object_ref
+
     def _process_single_reads_library(self, input_object_info, genome_index_base, 
                                       result_directory, cli_option_params):
         """
         _process_single_reads_library: process single reads library
         """
 
-        obj_type = self._get_type_from_obj_info(input_object_info['info'])
-        reads_files = self._get_reads_file(input_object_info['ref'], obj_type, result_directory)
+        reads_obj_type = self._get_type_from_obj_info(input_object_info['info'])
+        reads_obj_name = input_object_info['info'][1]
+        reads_files = self._get_reads_file(input_object_info['ref'], reads_obj_type, result_directory)
         
         tophat_result_dir = os.path.join(result_directory, 
-                                         'tophat2_result_' + str(int(time.time() * 100)))
+                                         'tophat2_result_' + reads_obj_name + 
+                                         '_' + str(int(time.time() * 100)))
         command = self._generate_command(genome_index_base, reads_files, 
                                          tophat_result_dir, cli_option_params)
         self._run_command(command)
 
+        alignment_object_name = reads_obj_name + cli_option_params.get('alignment_suffix')
         reads_alignment_object_ref = self._save_alignment(tophat_result_dir,
-                                                          cli_option_params.get('alignment_object_name'),
+                                                          alignment_object_name,
                                                           input_object_info['ref'],
                                                           cli_option_params.get('assembly_or_genome_ref'),
                                                           cli_option_params.get('workspace_name'),
@@ -261,6 +337,86 @@ class TopHatUtil:
         report_output = {'report_name': output['name'], 'report_ref': output['ref']}
 
         return report_output
+
+    def _generate_report_sets_library(self, reads_alignment_object_ref, result_directory, 
+                                      workspace_name):
+        """
+        _generate_report_sets_library: generate summary report for sample sets
+        """
+
+        objects_created = [{'ref': reads_alignment_object_ref,
+                            'description': 'RNASeq Alignment Set generated by TopHat2'}]
+        alignment_set_data = self.ws.get_objects2({'objects': 
+                                                  [{'ref':
+                                                   reads_alignment_object_ref}]})['data'][0]
+        alignment_refs = alignment_set_data['data'].get('sample_alignments')
+        for alignment_ref in alignment_refs:
+            objects_created.append({'ref': alignment_ref,
+                                    'description': 'RNASeq Alignment generated by TopHat2'})
+
+        output_files = self._generate_output_file_list_sets_library(result_directory)
+        output_html_files = self._generate_html_report_sets_library(reads_alignment_object_ref, 
+                                                                    result_directory)
+
+        report_params = {'message': '',
+                         'workspace_name': workspace_name,
+                         'file_links': output_files,
+                         'objects_created': objects_created,
+                         'html_links': output_html_files,
+                         'direct_html_link_index': 0,
+                         'html_window_height': 333,
+                         'report_object_name': 'kb_tophat2_report_' + str(uuid.uuid4())}
+
+        kbase_report_client = KBaseReport(self.callback_url)
+        output = kbase_report_client.create_extended_report(report_params)
+
+        report_output = {'report_name': output['name'], 'report_ref': output['ref']}
+
+        return report_output
+
+    def _generate_html_report_sets_library(self, reads_alignment_object_ref, result_directory):
+        """
+        _generate_html_report_sets_library: generate html summary report
+        """
+
+        log('start generating html report')
+
+        html_report = list()
+        result_file_path = os.path.join(result_directory, 'report.html')
+
+        alignment_data = self.ws.get_objects2({'objects': 
+                                              [{'ref':
+                                                reads_alignment_object_ref}]})['data'][0]['data']
+        alignment_info = self.ws.get_objects2({'objects': 
+                                              [{'ref':
+                                                reads_alignment_object_ref}]})['data'][0]['info']
+        alignment_stats = alignment_data['alignment_stats']
+
+        Overview_Content = ''
+        # Overview_Content += '<p>Generated Alignment Object:</p>'
+        # Overview_Content += '<p>{} ({})</p>'.format(alignment_info[1], reads_alignment_object_ref)
+        # Overview_Content += '<br />'
+        # Overview_Content += '<p>Library Type: {}</p>'.format(alignment_data['library_type'])
+        # Overview_Content += '<p>Condition: {}</p>'.format(alignment_data['condition'])
+        # Overview_Content += '<p>Total Reads: {}</p>'.format(alignment_stats['total_reads'])
+        # Overview_Content += '<p>Mapped Reads: {}</p>'.format(alignment_stats['mapped_reads'])
+        # Overview_Content += '<p>Unmapped Reads: {}</p>'.format(alignment_stats['unmapped_reads'])
+        # Overview_Content += '<p>Singletons: {}</p>'.format(alignment_stats['singletons'])
+        # Overview_Content += '<p>Alignment Rate: {}%</p>'.format(alignment_stats['alignment_rate'])
+
+        with open(result_file_path, 'w') as result_file:
+            with open(os.path.join(os.path.dirname(__file__), 'report_template.html'),
+                      'r') as report_template_file:
+                report_template = report_template_file.read()
+                report_template = report_template.replace('<p>Overview_Content</p>',
+                                                          Overview_Content)
+                result_file.write(report_template)
+
+        html_report.append({'path': result_file_path,
+                            'name': os.path.basename(result_file_path),
+                            'label': os.path.basename(result_file_path),
+                            'description': 'HTML summary report for TopHat2 App'})
+        return html_report
 
     def _generate_html_report_single_library(self, reads_alignment_object_ref, result_directory):
         """
@@ -335,17 +491,122 @@ class TopHatUtil:
 
         return output_files
 
+    def _generate_output_file_list_sets_library(self, result_directory):
+        """
+        _generate_output_file_list_sets_library: zip result files and generate file_links for report
+        """
+
+        log('start packing result files')
+
+        output_files = list()
+        result_dirs = os.listdir(result_directory)
+        tophat2_result_dir_names = filter(re.compile('tophat2_result_*').match, result_dirs)
+        result_files = list()
+
+        for tophat2_result_dir_name in tophat2_result_dir_names:
+            tophat2_result_dir = os.path.join(result_directory, tophat2_result_dir_name)
+            result_file = result_file = os.path.join(result_directory, 
+                                                     '{}.zip'.format(tophat2_result_dir_name.split('tophat2_result_')[1].rsplit('_', 1)[0]))
+            with zipfile.ZipFile(result_file, 'w',
+                                 zipfile.ZIP_DEFLATED,
+                                 allowZip64=True) as zip_file:
+                for root, dirs, files in os.walk(tophat2_result_dir):
+                    for file in files:
+                        if not (file.endswith('.DS_Store')):
+                            zip_file.write(os.path.join(root, file), file)
+            result_files.append(result_file)
+
+        for result_file in result_files:
+            output_files.append({'path': result_file,
+                                 'name': os.path.basename(result_file),
+                                 'label': os.path.basename(result_file),
+                                 'description': 'File generated by TopHat2 App'})
+
+        return output_files
+
+    def fetch_reads_refs_from_sampleset(self, ref, info):
+        """
+        Note: adapted from kbaseapps/kb_hisat2 - file_util.py
+
+        From the given object ref, return a list of all reads objects that are a part of that
+        object. E.g., if ref is a ReadsSet, return a list of all PairedEndLibrary or SingleEndLibrary
+        refs that are a member of that ReadsSet. This is returned as a list of dictionaries as follows:
+        {
+            "ref": reads object reference,
+            "condition": condition string associated with that reads object
+        }
+        The only one required is "ref", all other keys may or may not be present, based on the reads
+        object or object type in initial ref variable. E.g. a RNASeqSampleSet might have condition info
+        for each reads object, but a single PairedEndLibrary may not have that info.
+        If ref is already a Reads library, just returns a list with ref as a single element.
+        """
+        obj_type = self._get_type_from_obj_info(info)
+        refs = list()
+        if "KBaseSets.ReadsSet" in obj_type:
+            print("Looking up reads references in ReadsSet object")
+            set_client = SetAPI(self.srv_wiz_url)
+            reads_set = set_client.get_reads_set_v1({'ref': ref,
+                                                     'include_item_info': 0
+                                                     })
+            for reads in reads_set["data"]["items"]:
+                refs.append({'ref': reads['ref'],
+                             'condition': reads['label']
+                             })
+        elif "KBaseRNASeq.RNASeqSampleSet" in obj_type:
+            print("Looking up reads references in RNASeqSampleSet object")
+            sample_set = self.ws.get_objects2({"objects": [{"ref": ref}]})["data"][0]["data"]
+            for i in range(len(sample_set["sample_ids"])):
+                refs.append({'ref': sample_set["sample_ids"][i],
+                             'condition': sample_set["condition"][i]
+                             })
+        else:
+            raise ValueError("Unable to fetch reads reference from object {} "
+                             "which is a {}".format(ref, obj_type))
+
+        return refs
+
+    def _process_set_reads_library(self, input_object_info, genome_index_base, 
+                                   result_directory, cli_option_params):
+        """
+        _process_set_reads_library: process set reads library
+        """
+
+        reads_refs = self.fetch_reads_refs_from_sampleset(input_object_info['ref'],
+                                                          input_object_info['info'])
+
+        set_object_name = input_object_info['info'][1]
+        alignment_set_name = set_object_name + cli_option_params['alignment_set_suffix']
+
+        reads_alignment_object_refs = []
+        for reads_ref in reads_refs:
+            reads_input_object_info = self._get_input_object_info(reads_ref['ref'])
+            cli_option_params['reads_condition'] = reads_ref['condition']
+            reads_alignment_object_ref = self._process_single_reads_library(reads_input_object_info,
+                                                                            genome_index_base,
+                                                                            result_directory,
+                                                                            cli_option_params)
+            reads_alignment_object_refs.append(reads_alignment_object_ref)
+
+        reads_alignment_set_object_ref = self._save_alignment_set(reads_alignment_object_refs,
+                                                                  cli_option_params['workspace_name'],
+                                                                  alignment_set_name,
+                                                                  input_object_info['ref'])
+
+        return reads_alignment_set_object_ref
+
     def __init__(self, config):
         self.ws_url = config["workspace-url"]
         self.callback_url = config['SDK_CALLBACK_URL']
         self.token = config['KB_AUTH_TOKEN']
         self.shock_url = config['shock-url']
         self.scratch = config['scratch']
+        self.srv_wiz_url = config['srv-wiz-url']
         self.ws = Workspace(self.ws_url, token=self.token)
 
         self.bt = kb_Bowtie2(self.callback_url, service_ver='dev')
-        self.ru = ReadsUtils(self.callback_url)
         self.rau = ReadsAlignmentUtils(self.callback_url, service_ver='dev')
+        self.ru = ReadsUtils(self.callback_url)
+        self.dfu = DataFileUtil(self.callback_url)
 
     def run_tophat2_app(self, params):
         """
@@ -356,7 +617,8 @@ class TopHatUtil:
         input_ref: input reads object (Single/Paired_reads, reads_set, sample_set)
         assembly_or_genome_ref: ref to Assembly, ContigSet, or Genome
         workspace_name: the name of the workspace it gets saved to
-        alignment_object_name: output Alignment or AlignmentSet object name
+        alignment_set_suffix: suffix append to alignment set object name
+        alignment_suffix: suffix append to alignment object name
 
         optional params:
         reads_condition: condition associated with the input reads objec (ignored for sets of samples)
@@ -406,7 +668,14 @@ class TopHatUtil:
                                                                  result_directory,
                                                                  params.get('workspace_name'))
         elif input_object_info['run_mode'] == 'sample_set':
-            reads_alignment_object_ref = self._process_set_reads_library()
+            reads_alignment_object_ref = self._process_set_reads_library(input_object_info,
+                                                                         genome_index_base,
+                                                                         result_directory,
+                                                                         params)
+            report_output = self._generate_report_sets_library(reads_alignment_object_ref,
+                                                               result_directory,
+                                                               params.get('workspace_name'))
+            report_output = {'a': 'a'}
 
         returnVal = {'result_directory': result_directory,
                      'reads_alignment_object_ref': reads_alignment_object_ref}

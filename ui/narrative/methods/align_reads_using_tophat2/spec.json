@@ -35,17 +35,20 @@
             }
         }, 
         {
-            "id" : "alignment_object_name",
+            "id" : "alignment_suffix",
             "optional" : false,
             "advanced" : false,
             "allow_multiple" : false,
-            "default_values" : [ "" ],
-            "field_type" : "text",
-            "text_options" : 
-            {
-                "valid_ws_types" : ["KBaseRNASeq.RNASeqAlignment", "KBaseRNASeq.RNASeqAlignmentSet" ],
-                "is_output_name" : true
-            }
+            "default_values" : [ "_alignment" ],
+            "field_type" : "text"
+        },
+        {
+            "id" : "alignment_set_suffix",
+            "optional" : true,
+            "advanced" : false,
+            "allow_multiple" : false,
+            "default_values" : [ "_alignment_set" ],
+            "field_type" : "text"
         },
         {
             "id" : "reads_condition",
@@ -241,8 +244,12 @@
                     "target_property" : "assembly_or_genome_ref"
                 },
                 {
-                    "input_parameter" : "alignment_object_name",
-                    "target_property" : "alignment_object_name"
+                    "input_parameter" : "alignment_suffix",
+                    "target_property" : "alignment_suffix"
+                },
+                {
+                    "input_parameter" : "alignment_set_suffix",
+                    "target_property" : "alignment_set_suffix"
                 },
                 {
                     "input_parameter" : "reads_condition",

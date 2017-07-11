@@ -3,6 +3,10 @@
   "type" : "sdk",
   "version_tag" : "release"
 }, {
+  "module_name" : "DataFileUtil",
+  "type" : "sdk",
+  "version_tag" : "release"
+}, {
   "module_name" : "kb_Bowtie2",
   "type" : "sdk",
   "version_tag" : "release"
@@ -16,6 +20,10 @@
   "version_tag" : "release"
 }, {
   "module_name" : "ReadsUtils",
+  "type" : "sdk",
+  "version_tag" : "release"
+}, {
+  "module_name" : "SetAPI",
   "type" : "sdk",
   "version_tag" : "release"
 }, {
