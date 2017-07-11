@@ -125,7 +125,8 @@ TopHatInput is a reference to a hash where the following keys are defined:
 	input_ref has a value which is a kb_tophat2.obj_ref
 	assembly_or_genome_ref has a value which is a kb_tophat2.obj_ref
 	workspace_name has a value which is a string
-	alignment_object_name has a value which is a string
+	alignment_set_suffix has a value which is a string
+	alignment_suffix has a value which is a string
 	reads_condition has a value which is a string
 	num_threads has a value which is an int
 	read_mismatches has a value which is an int
@@ -158,7 +159,8 @@ TopHatInput is a reference to a hash where the following keys are defined:
 	input_ref has a value which is a kb_tophat2.obj_ref
 	assembly_or_genome_ref has a value which is a kb_tophat2.obj_ref
 	workspace_name has a value which is a string
-	alignment_object_name has a value which is a string
+	alignment_set_suffix has a value which is a string
+	alignment_suffix has a value which is a string
 	reads_condition has a value which is a string
 	num_threads has a value which is an int
 	read_mismatches has a value which is an int
@@ -402,7 +404,8 @@ required params:
 input_ref: input reads object (Single/Paired_reads, reads_set, sample_set)
 assembly_or_genome_ref: ref to Assembly, ContigSet, or Genome
 workspace_name: the name of the workspace it gets saved to
-alignment_object_name: output Alignment or AlignmentSet object name
+alignment_set_suffix: suffix append to alignment set object name
+alignment_suffix: suffix append to alignment object name
 
 optional params:
 reads_condition: condition associated with the input reads objec (ignored for sets of samples)
@@ -430,7 +433,8 @@ a reference to a hash where the following keys are defined:
 input_ref has a value which is a kb_tophat2.obj_ref
 assembly_or_genome_ref has a value which is a kb_tophat2.obj_ref
 workspace_name has a value which is a string
-alignment_object_name has a value which is a string
+alignment_set_suffix has a value which is a string
+alignment_suffix has a value which is a string
 reads_condition has a value which is a string
 num_threads has a value which is an int
 read_mismatches has a value which is an int
@@ -454,7 +458,8 @@ a reference to a hash where the following keys are defined:
 input_ref has a value which is a kb_tophat2.obj_ref
 assembly_or_genome_ref has a value which is a kb_tophat2.obj_ref
 workspace_name has a value which is a string
-alignment_object_name has a value which is a string
+alignment_set_suffix has a value which is a string
+alignment_suffix has a value which is a string
 reads_condition has a value which is a string
 num_threads has a value which is an int
 read_mismatches has a value which is an int

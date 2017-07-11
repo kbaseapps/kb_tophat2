@@ -41,10 +41,11 @@ class kb_tophat2(object):
            input_ref: input reads object (Single/Paired_reads, reads_set,
            sample_set) assembly_or_genome_ref: ref to Assembly, ContigSet, or
            Genome workspace_name: the name of the workspace it gets saved to
-           alignment_object_name: output Alignment or AlignmentSet object
-           name optional params: reads_condition: condition associated with
-           the input reads objec (ignored for sets of samples) num_threads:
-           number of processing threads read_mismatches: read mismatch cutoff
+           alignment_set_suffix: suffix append to alignment set object name
+           alignment_suffix: suffix append to alignment object name optional
+           params: reads_condition: condition associated with the input reads
+           objec (ignored for sets of samples) num_threads: number of
+           processing threads read_mismatches: read mismatch cutoff
            read_gap_length: read gap cutoff read_edit_dist: read edit cutoff
            min_intron_length: minimum intron length max_intron_length:
            maximum intron length min_anchor_length: minimum anchor length
@@ -58,12 +59,13 @@ class kb_tophat2(object):
            parameter "input_ref" of type "obj_ref" (An X/Y/Z style
            reference), parameter "assembly_or_genome_ref" of type "obj_ref"
            (An X/Y/Z style reference), parameter "workspace_name" of String,
-           parameter "alignment_object_name" of String, parameter
-           "reads_condition" of String, parameter "num_threads" of Long,
-           parameter "read_mismatches" of Long, parameter "read_gap_length"
-           of Long, parameter "read_edit_dist" of Long, parameter
-           "min_intron_length" of Long, parameter "max_intron_length" of
-           Long, parameter "min_anchor_length" of Long, parameter
+           parameter "alignment_set_suffix" of String, parameter
+           "alignment_suffix" of String, parameter "reads_condition" of
+           String, parameter "num_threads" of Long, parameter
+           "read_mismatches" of Long, parameter "read_gap_length" of Long,
+           parameter "read_edit_dist" of Long, parameter "min_intron_length"
+           of Long, parameter "max_intron_length" of Long, parameter
+           "min_anchor_length" of Long, parameter
            "report_secondary_alignments" of type "boolean" (A boolean - 0 for
            false, 1 for true. @range (0, 1)), parameter "no_coverage_search"
            of type "boolean" (A boolean - 0 for false, 1 for true. @range (0,

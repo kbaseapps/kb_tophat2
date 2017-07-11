@@ -18,7 +18,8 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  * input_ref: input reads object (Single/Paired_reads, reads_set, sample_set)
  * assembly_or_genome_ref: ref to Assembly, ContigSet, or Genome
  * workspace_name: the name of the workspace it gets saved to
- * alignment_object_name: output Alignment or AlignmentSet object name
+ * alignment_set_suffix: suffix append to alignment set object name
+ * alignment_suffix: suffix append to alignment object name
  * optional params:
  * reads_condition: condition associated with the input reads objec (ignored for sets of samples)
  * num_threads: number of processing threads
@@ -42,7 +43,8 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "input_ref",
     "assembly_or_genome_ref",
     "workspace_name",
-    "alignment_object_name",
+    "alignment_set_suffix",
+    "alignment_suffix",
     "reads_condition",
     "num_threads",
     "read_mismatches",
@@ -64,8 +66,10 @@ public class TopHatInput {
     private String assemblyOrGenomeRef;
     @JsonProperty("workspace_name")
     private String workspaceName;
-    @JsonProperty("alignment_object_name")
-    private String alignmentObjectName;
+    @JsonProperty("alignment_set_suffix")
+    private String alignmentSetSuffix;
+    @JsonProperty("alignment_suffix")
+    private String alignmentSuffix;
     @JsonProperty("reads_condition")
     private String readsCondition;
     @JsonProperty("num_threads")
@@ -137,18 +141,33 @@ public class TopHatInput {
         return this;
     }
 
-    @JsonProperty("alignment_object_name")
-    public String getAlignmentObjectName() {
-        return alignmentObjectName;
+    @JsonProperty("alignment_set_suffix")
+    public String getAlignmentSetSuffix() {
+        return alignmentSetSuffix;
     }
 
-    @JsonProperty("alignment_object_name")
-    public void setAlignmentObjectName(String alignmentObjectName) {
-        this.alignmentObjectName = alignmentObjectName;
+    @JsonProperty("alignment_set_suffix")
+    public void setAlignmentSetSuffix(String alignmentSetSuffix) {
+        this.alignmentSetSuffix = alignmentSetSuffix;
     }
 
-    public TopHatInput withAlignmentObjectName(String alignmentObjectName) {
-        this.alignmentObjectName = alignmentObjectName;
+    public TopHatInput withAlignmentSetSuffix(String alignmentSetSuffix) {
+        this.alignmentSetSuffix = alignmentSetSuffix;
+        return this;
+    }
+
+    @JsonProperty("alignment_suffix")
+    public String getAlignmentSuffix() {
+        return alignmentSuffix;
+    }
+
+    @JsonProperty("alignment_suffix")
+    public void setAlignmentSuffix(String alignmentSuffix) {
+        this.alignmentSuffix = alignmentSuffix;
+    }
+
+    public TopHatInput withAlignmentSuffix(String alignmentSuffix) {
+        this.alignmentSuffix = alignmentSuffix;
         return this;
     }
 
@@ -344,7 +363,7 @@ public class TopHatInput {
 
     @Override
     public String toString() {
-        return ((((((((((((((((((((((((((((((((((("TopHatInput"+" [inputRef=")+ inputRef)+", assemblyOrGenomeRef=")+ assemblyOrGenomeRef)+", workspaceName=")+ workspaceName)+", alignmentObjectName=")+ alignmentObjectName)+", readsCondition=")+ readsCondition)+", numThreads=")+ numThreads)+", readMismatches=")+ readMismatches)+", readGapLength=")+ readGapLength)+", readEditDist=")+ readEditDist)+", minIntronLength=")+ minIntronLength)+", maxIntronLength=")+ maxIntronLength)+", minAnchorLength=")+ minAnchorLength)+", reportSecondaryAlignments=")+ reportSecondaryAlignments)+", noCoverageSearch=")+ noCoverageSearch)+", libraryType=")+ libraryType)+", presetOptions=")+ presetOptions)+", additionalProperties=")+ additionalProperties)+"]");
+        return ((((((((((((((((((((((((((((((((((((("TopHatInput"+" [inputRef=")+ inputRef)+", assemblyOrGenomeRef=")+ assemblyOrGenomeRef)+", workspaceName=")+ workspaceName)+", alignmentSetSuffix=")+ alignmentSetSuffix)+", alignmentSuffix=")+ alignmentSuffix)+", readsCondition=")+ readsCondition)+", numThreads=")+ numThreads)+", readMismatches=")+ readMismatches)+", readGapLength=")+ readGapLength)+", readEditDist=")+ readEditDist)+", minIntronLength=")+ minIntronLength)+", maxIntronLength=")+ maxIntronLength)+", minAnchorLength=")+ minAnchorLength)+", reportSecondaryAlignments=")+ reportSecondaryAlignments)+", noCoverageSearch=")+ noCoverageSearch)+", libraryType=")+ libraryType)+", presetOptions=")+ presetOptions)+", additionalProperties=")+ additionalProperties)+"]");
     }
 
 }

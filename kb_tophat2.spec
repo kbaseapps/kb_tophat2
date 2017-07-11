@@ -17,7 +17,8 @@ module kb_tophat2 {
         input_ref: input reads object (Single/Paired_reads, reads_set, sample_set)
         assembly_or_genome_ref: ref to Assembly, ContigSet, or Genome
         workspace_name: the name of the workspace it gets saved to
-        alignment_object_name: output Alignment or AlignmentSet object name
+        alignment_set_suffix: suffix append to alignment set object name
+        alignment_suffix: suffix append to alignment object name
 
         optional params:
         reads_condition: condition associated with the input reads objec (ignored for sets of samples)
@@ -39,7 +40,8 @@ module kb_tophat2 {
         obj_ref input_ref;
         obj_ref assembly_or_genome_ref;
         string workspace_name;
-        string alignment_object_name;
+        string alignment_set_suffix;
+        string alignment_suffix;
         
         string reads_condition;
         int num_threads;

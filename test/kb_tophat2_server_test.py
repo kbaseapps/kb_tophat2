@@ -23,6 +23,7 @@ from kb_tophat2.authclient import KBaseAuth as _KBaseAuth
 from kb_tophat2.Utils.TopHatUtil import TopHatUtil
 from AssemblyUtil.AssemblyUtilClient import AssemblyUtil
 from ReadsUtils.ReadsUtilsClient import ReadsUtils
+from DataFileUtil.DataFileUtilClient import DataFileUtil
 
 
 class kb_tophat2Test(unittest.TestCase):
@@ -66,6 +67,7 @@ class kb_tophat2Test(unittest.TestCase):
 
         cls.ru = ReadsUtils(cls.callback_url)
         cls.au = AssemblyUtil(cls.callback_url)
+        cls.dfu = DataFileUtil(cls.callback_url)
 
         cls.prepare_data()
 
@@ -112,8 +114,29 @@ class kb_tophat2Test(unittest.TestCase):
                                                             'assembly_name': assemlby_name
                                                             })
 
+        # upload sample set object
+        sample_set_data = {'Library_type': 'SingleEnd',
+                           'condition': ['test_condition_1', 'test_condition_2'],
+                           'domain': 'Test',
+                           'num_samples': 2,
+                           'platform': 'Test',
+                           'publication_id': 'Test',
+                           'sample_ids': [cls.se_reads_ref, cls.pe_reads_ref],
+                           'sampleset_desc': 'Generated for testing',
+                           'sampleset_id': 'test_sample_set',
+                           'source': 'Test'}
+        save_object_params = {
+            'id': cls.dfu.ws_name_to_id(cls.wsName),
+            'objects': [{'type': 'KBaseRNASeq.RNASeqSampleSet',
+                         'data': sample_set_data,
+                         'name': 'test_sample_set'}]
+        }
+
+        dfu_oi = cls.dfu.save_objects(save_object_params)[0]
+        cls.sample_set_ref = str(dfu_oi[6]) + '/' + str(dfu_oi[0]) + '/' + str(dfu_oi[4])
+
     def getWsClient(self):
-        return self.__class__.wsClient
+        return self.__class__.wsClients
 
     def getWsName(self):
         return self.__class__.wsName
@@ -129,7 +152,7 @@ class kb_tophat2Test(unittest.TestCase):
             'missing_input_ref': 'input_ref',
             'assembly_or_genome_ref': 'assembly_or_genome_ref',
             'workspace_name': 'workspace_name',
-            'alignment_object_name': 'alignment_object_name'
+            'alignment_suffix': 'alignment_suffix'
         }
         with self.assertRaisesRegexp(
                 ValueError, '"input_ref" parameter is required, but missing'):
@@ -139,7 +162,7 @@ class kb_tophat2Test(unittest.TestCase):
             'input_ref': 'input_ref',
             'missing_assembly_or_genome_ref': 'assembly_or_genome_ref',
             'workspace_name': 'workspace_name',
-            'alignment_object_name': 'alignment_object_name'
+            'alignment_suffix': 'alignment_suffix'
         }
         with self.assertRaisesRegexp(
                 ValueError, '"assembly_or_genome_ref" parameter is required, but missing'):
@@ -149,7 +172,7 @@ class kb_tophat2Test(unittest.TestCase):
             'input_ref': 'input_ref',
             'assembly_or_genome_ref': 'assembly_or_genome_ref',
             'missing_workspace_name': 'workspace_name',
-            'alignment_object_name': 'alignment_object_name'
+            'alignment_suffix': 'alignment_suffix'
         }
         with self.assertRaisesRegexp(
                 ValueError, '"workspace_name" parameter is required, but missing'):
@@ -159,10 +182,10 @@ class kb_tophat2Test(unittest.TestCase):
             'input_ref': 'input_ref',
             'assembly_or_genome_ref': 'assembly_or_genome_ref',
             'workspace_name': 'workspace_name',
-            'missing_alignment_object_name': 'alignment_object_name'
+            'missing_alignment_suffix': 'alignment_suffix'
         }
         with self.assertRaisesRegexp(
-                ValueError, '"alignment_object_name" parameter is required, but missing'):
+                ValueError, '"alignment_suffix" parameter is required, but missing'):
             self.getImpl().run_tophat2_app(self.getContext(), invalidate_input_params)
 
     def test_run_tophat2_app_se_reads(self):
@@ -170,7 +193,8 @@ class kb_tophat2Test(unittest.TestCase):
             'input_ref': self.se_reads_ref,
             'assembly_or_genome_ref': self.assembly_ref,
             'workspace_name': self.getWsName(),
-            'alignment_object_name': 'My_Alignment',
+            'alignment_suffix': '_alignment',
+            'alignment_set_suffix': '_alignment_set',
             'reads_condition': 'test_condition',
             'read_mismatches': 2,
             'read_gap_length': 2,
@@ -206,7 +230,8 @@ class kb_tophat2Test(unittest.TestCase):
             'input_ref': self.pe_reads_ref,
             'assembly_or_genome_ref': self.assembly_ref,
             'workspace_name': self.getWsName(),
-            'alignment_object_name': 'My_Alignment',
+            'alignment_suffix': '_alignment',
+            'alignment_set_suffix': '_alignment_set',
             'reads_condition': 'test_condition',
             'read_mismatches': 2,
             'read_gap_length': 2,
@@ -236,3 +261,36 @@ class kb_tophat2Test(unittest.TestCase):
         self.assertEqual(alignment_data.get('read_sample_id'), self.pe_reads_ref)
         self.assertEqual(alignment_data.get('genome_id'), self.assembly_ref)
         self.assertEqual(alignment_data.get('library_type'), 'paired')
+
+    def test_run_tophat2_app_sample_set(self):
+        input_params = {
+            'input_ref': self.sample_set_ref,
+            'assembly_or_genome_ref': self.assembly_ref,
+            'workspace_name': self.getWsName(),
+            'alignment_suffix': '_alignment',
+            'alignment_set_suffix': '_alignment_set',
+            'reads_condition': 'test_condition',
+            'read_mismatches': 2,
+            'read_gap_length': 2,
+            'read_edit_dist': 2,
+            'min_intron_length': 70,
+            'max_intron_length': 500000,
+            'min_anchor_length': 8,
+            'report_secondary_alignments': 1,
+            'no_coverage_search': 1,
+            'library_type': 'fr-unstranded',
+            'preset_options': 'b2-very-fast'
+        }
+
+        result = self.getImpl().run_tophat2_app(self.getContext(), input_params)[0]
+
+        self.assertTrue('result_directory' in result)
+        result_files = os.listdir(result['result_directory'])
+        print result_files
+        self.assertTrue('reads_alignment_object_ref' in result)
+        alignment_set_data = self.ws.get_objects2({'objects': 
+                                                  [{'ref': 
+                                                   result.get('reads_alignment_object_ref')}]})['data'][0]['data']
+        self.assertEqual(alignment_set_data.get('sampleset_id'), self.sample_set_ref)
+        self.assertItemsEqual(alignment_set_data.get('read_sample_ids'),
+                              [self.se_reads_ref, self.pe_reads_ref])
