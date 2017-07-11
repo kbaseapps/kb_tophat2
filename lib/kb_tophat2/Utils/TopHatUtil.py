@@ -390,7 +390,7 @@ class TopHatUtil:
         alignment_info = self.ws.get_objects2({'objects': 
                                               [{'ref':
                                                 reads_alignment_object_ref}]})['data'][0]['info']
-        alignment_stats = alignment_data['alignment_stats']
+        # alignment_stats = alignment_data['alignment_stats']
 
         Overview_Content = ''
         # Overview_Content += '<p>Generated Alignment Object:</p>'
