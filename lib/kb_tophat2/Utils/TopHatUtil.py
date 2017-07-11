@@ -675,7 +675,6 @@ class TopHatUtil:
             report_output = self._generate_report_sets_library(reads_alignment_object_ref,
                                                                result_directory,
                                                                params.get('workspace_name'))
-            report_output = {'a': 'a'}
 
         returnVal = {'result_directory': result_directory,
                      'reads_alignment_object_ref': reads_alignment_object_ref}
