@@ -384,26 +384,44 @@ class TopHatUtil:
         html_report = list()
         result_file_path = os.path.join(result_directory, 'report.html')
 
-        alignment_data = self.ws.get_objects2({'objects': 
-                                              [{'ref':
-                                                reads_alignment_object_ref}]})['data'][0]['data']
-        alignment_info = self.ws.get_objects2({'objects': 
-                                              [{'ref':
-                                                reads_alignment_object_ref}]})['data'][0]['info']
-        # alignment_stats = alignment_data['alignment_stats']
+        alignment_set_data = self.ws.get_objects2({'objects': 
+                                                  [{'ref':
+                                                   reads_alignment_object_ref}]})['data'][0]['data']
+        alignment_set_info = self.ws.get_objects2({'objects': 
+                                                  [{'ref':
+                                                   reads_alignment_object_ref}]})['data'][0]['info']
+        sample_alignments = alignment_set_data['sample_alignments']
 
         Overview_Content = ''
-        # Overview_Content += '<p>Generated Alignment Object:</p>'
-        # Overview_Content += '<p>{} ({})</p>'.format(alignment_info[1], reads_alignment_object_ref)
-        # Overview_Content += '<br />'
-        # Overview_Content += '<p>Library Type: {}</p>'.format(alignment_data['library_type'])
-        # Overview_Content += '<p>Condition: {}</p>'.format(alignment_data['condition'])
-        # Overview_Content += '<p>Total Reads: {}</p>'.format(alignment_stats['total_reads'])
-        # Overview_Content += '<p>Mapped Reads: {}</p>'.format(alignment_stats['mapped_reads'])
-        # Overview_Content += '<p>Unmapped Reads: {}</p>'.format(alignment_stats['unmapped_reads'])
-        # Overview_Content += '<p>Singletons: {}</p>'.format(alignment_stats['singletons'])
-        # Overview_Content += '<p>Alignment Rate: {}%</p>'.format(alignment_stats['alignment_rate'])
+        Overview_Content += '<br/><table><tr><th>Generated AlignmentSet Object</th></tr>'
+        Overview_Content += '<tr><td>{} ({})</td></tr></table>'.format(alignment_set_info[1],
+                                                                       reads_alignment_object_ref)
+        Overview_Content += '<p><br/></p>'
+        Overview_Content += '<table><tr><th>Generated Alignment Objects</th><th></th><th></th>'
+        Overview_Content += '<th></th><th></th><th></th><th></th></tr>'
+        Overview_Content += '<tr><th>Alignment Name</th><th>Condition</th><th>Total Reads</th>'
+        Overview_Content += '<th>Mapped Reads</th><th>Unmapped Reads</th><th>Singletons</th>'
+        Overview_Content += '<th>Alignment Rate</th></tr>'
+        
+        for sample_alignment in sample_alignments:
+            alignment_data = self.ws.get_objects2({'objects': 
+                                                  [{'ref':
+                                                   sample_alignment}]})['data'][0]['data']
 
+            alignment_info = self.ws.get_objects2({'objects': 
+                                                  [{'ref':
+                                                   sample_alignment}]})['data'][0]['info']
+            alignment_stats = alignment_data['alignment_stats']
+
+            Overview_Content += '<tr><td>{} ({})</td><td>{}</td>'.format(alignment_info[1],
+                                                                         sample_alignment,
+                                                                         alignment_data['condition'])
+            Overview_Content += '<td>{}</td><td>{}</td>'.format(alignment_stats['total_reads'],
+                                                                alignment_stats['mapped_reads'])
+            Overview_Content += '<td>{}</td><td>{}</td>'.format(alignment_stats['unmapped_reads'],
+                                                                alignment_stats['singletons'])
+            Overview_Content += '<td>{}%</td></tr>'.format(alignment_stats['alignment_rate'])
+        Overview_Content += '</table>'
         with open(result_file_path, 'w') as result_file:
             with open(os.path.join(os.path.dirname(__file__), 'report_template.html'),
                       'r') as report_template_file:
