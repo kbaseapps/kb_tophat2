@@ -223,7 +223,6 @@ class kb_tophat2Test(unittest.TestCase):
         self.assertEqual(alignment_data.get('condition'), 'test_condition')
         self.assertEqual(alignment_data.get('read_sample_id'), self.se_reads_ref)
         self.assertEqual(alignment_data.get('genome_id'), self.assembly_ref)
-        self.assertEqual(alignment_data.get('library_type'), 'single')
 
     def test_run_tophat2_app_pe_reads(self):
         input_params = {
@@ -260,7 +259,6 @@ class kb_tophat2Test(unittest.TestCase):
         self.assertEqual(alignment_data.get('condition'), 'test_condition')
         self.assertEqual(alignment_data.get('read_sample_id'), self.pe_reads_ref)
         self.assertEqual(alignment_data.get('genome_id'), self.assembly_ref)
-        self.assertEqual(alignment_data.get('library_type'), 'paired')
 
     def test_run_tophat2_app_sample_set(self):
         input_params = {
