@@ -6,6 +6,8 @@ import errno
 import subprocess
 import re
 import zipfile
+from pathos.multiprocessing import ProcessingPool as Pool
+import multiprocessing
 
 from Workspace.WorkspaceClient import Workspace as Workspace
 from kb_Bowtie2.kb_Bowtie2Client import kb_Bowtie2
@@ -595,15 +597,21 @@ class TopHatUtil:
         set_object_name = input_object_info['info'][1]
         alignment_set_name = set_object_name + cli_option_params['alignment_set_suffix']
 
-        reads_alignment_object_refs = []
+        arg_1 = []
+        arg_2 = [genome_index_base] * 4
+        arg_3 = [result_directory] * 4
+        arg_4 = []
         for reads_ref in reads_refs:
             reads_input_object_info = self._get_input_object_info(reads_ref['ref'])
             cli_option_params['reads_condition'] = reads_ref['condition']
-            reads_alignment_object_ref = self._process_single_reads_library(reads_input_object_info,
-                                                                            genome_index_base,
-                                                                            result_directory,
-                                                                            cli_option_params)
-            reads_alignment_object_refs.append(reads_alignment_object_ref)
+            arg_1.append(reads_input_object_info)
+            arg_4.append(cli_option_params)
+
+        cpus = min(cli_option_params.get('num_threads'), multiprocessing.cpu_count())
+        pool = Pool(ncpus=cpus)
+        log('running _process_alignment_object with {} cpus'.format(cpus))
+        reads_alignment_object_refs = pool.map(self._process_single_reads_library, 
+                                               arg_1, arg_2, arg_3, arg_4)
 
         reads_alignment_set_object_ref = self._save_alignment_set(reads_alignment_object_refs,
                                                                   cli_option_params['workspace_name'],
