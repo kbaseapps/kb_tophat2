@@ -603,9 +603,10 @@ class TopHatUtil:
         arg_4 = []
         for reads_ref in reads_refs:
             reads_input_object_info = self._get_input_object_info(reads_ref['ref'])
-            cli_option_params['reads_condition'] = reads_ref['condition']
+            option_params = cli_option_params.copy()
+            option_params['reads_condition'] = reads_ref['condition']
             arg_1.append(reads_input_object_info)
-            arg_4.append(cli_option_params)
+            arg_4.append(option_params)
 
         cpus = min(cli_option_params.get('num_threads'), multiprocessing.cpu_count())
         pool = Pool(ncpus=cpus)
