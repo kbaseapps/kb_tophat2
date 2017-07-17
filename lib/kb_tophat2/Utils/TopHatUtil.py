@@ -235,8 +235,6 @@ class TopHatUtil:
         save_result = self.set_client.save_reads_alignment_set_v1(alignment_set_save_params)
         alignment_set_object_ref = save_result['set_ref']
 
-        print save_result
-
         return alignment_set_object_ref
 
     def _process_single_reads_library(self, input_object_info, genome_index_base, 
