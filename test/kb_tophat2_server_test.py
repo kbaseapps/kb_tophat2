@@ -289,6 +289,5 @@ class kb_tophat2Test(unittest.TestCase):
         alignment_set_data = self.ws.get_objects2({'objects': 
                                                   [{'ref': 
                                                    result.get('reads_alignment_object_ref')}]})['data'][0]['data']
-        self.assertEqual(alignment_set_data.get('sampleset_id'), self.sample_set_ref)
-        self.assertItemsEqual(alignment_set_data.get('read_sample_ids'),
-                              [self.se_reads_ref, self.pe_reads_ref])
+        self.assertTrue('items' in alignment_set_data)
+        self.assertTrue('description' in alignment_set_data)
