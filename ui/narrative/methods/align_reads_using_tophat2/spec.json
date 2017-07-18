@@ -39,7 +39,7 @@
             "optional" : false,
             "advanced" : false,
             "allow_multiple" : false,
-            "default_values" : [ "_alignment" ],
+            "default_values" : [ "tophat_alignment" ],
             "field_type" : "text"
         },
         {
@@ -47,7 +47,7 @@
             "optional" : true,
             "advanced" : false,
             "allow_multiple" : false,
-            "default_values" : [ "_alignment_set" ],
+            "default_values" : [ "tophat_alignment_set" ],
             "field_type" : "text"
         },
         {
