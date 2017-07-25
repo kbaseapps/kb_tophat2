@@ -37,7 +37,7 @@
         {
             "id" : "alignment_suffix",
             "optional" : false,
-            "advanced" : false,
+            "advanced" : true,
             "allow_multiple" : false,
             "default_values" : [ "_tophat_alignment" ],
             "field_type" : "text"
@@ -45,7 +45,7 @@
         {
             "id" : "alignment_set_suffix",
             "optional" : true,
-            "advanced" : false,
+            "advanced" : true,
             "allow_multiple" : false,
             "default_values" : [ "_tophat_alignment_set" ],
             "field_type" : "text"
