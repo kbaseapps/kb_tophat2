@@ -7,6 +7,10 @@
   "type" : "sdk",
   "version_tag" : "release"
 }, {
+  "module_name" : "GenomeFileUtil",
+  "type" : "sdk",
+  "version_tag" : "release"
+}, {
   "module_name" : "kb_Bowtie2",
   "type" : "sdk",
   "version_tag" : "release"
