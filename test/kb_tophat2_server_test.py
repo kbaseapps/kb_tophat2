@@ -24,6 +24,7 @@ from kb_tophat2.Utils.TopHatUtil import TopHatUtil
 from AssemblyUtil.AssemblyUtilClient import AssemblyUtil
 from ReadsUtils.ReadsUtilsClient import ReadsUtils
 from DataFileUtil.DataFileUtilClient import DataFileUtil
+from GenomeFileUtil.GenomeFileUtilClient import GenomeFileUtil
 
 
 class kb_tophat2Test(unittest.TestCase):
@@ -68,6 +69,7 @@ class kb_tophat2Test(unittest.TestCase):
         cls.ru = ReadsUtils(cls.callback_url)
         cls.au = AssemblyUtil(cls.callback_url)
         cls.dfu = DataFileUtil(cls.callback_url)
+        cls.gfu = GenomeFileUtil(cls.callback_url)
 
         cls.prepare_data()
 
@@ -113,6 +115,17 @@ class kb_tophat2Test(unittest.TestCase):
                                                             'workspace_name': cls.wsName,
                                                             'assembly_name': assemlby_name
                                                             })
+
+        # upload genome object
+        genbank_file_name = 'minimal.gbff'
+        genbank_file_path = os.path.join(cls.scratch, genbank_file_name)
+        shutil.copy(os.path.join('data', genbank_file_name), genbank_file_path)
+
+        genome_object_name = 'test_Genome'
+        cls.genome_ref = cls.gfu.genbank_to_genome({'file': {'path': genbank_file_path},
+                                                    'workspace_name': cls.wsName,
+                                                    'genome_name': genome_object_name
+                                                    })['genome_ref']
 
         # upload sample set object
         sample_set_data = {'Library_type': 'SingleEnd',
@@ -263,7 +276,7 @@ class kb_tophat2Test(unittest.TestCase):
     def test_run_tophat2_app_sample_set(self):
         input_params = {
             'input_ref': self.sample_set_ref,
-            'assembly_or_genome_ref': self.assembly_ref,
+            'assembly_or_genome_ref': self.genome_ref,
             'workspace_name': self.getWsName(),
             'alignment_suffix': '_alignment',
             'alignment_set_suffix': '_alignment_set',

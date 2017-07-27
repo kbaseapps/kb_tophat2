@@ -141,10 +141,10 @@ class ReadsAlignmentUtils(object):
            "validate" of type "boolean" (A boolean - 0 for false, 1 for true.
            @range (0, 1)), parameter "ignore" of list of String
         :returns: instance of type "DownloadAlignmentOutput" (*  The output
-           of the download method.  *) -> structure: parameter "ws_id" of
-           String, parameter "destination_dir" of String, parameter "stats"
-           of type "AlignmentStats" -> structure: parameter "properly_paired"
-           of Long, parameter "multiple_alignments" of Long, parameter
+           of the download method.  *) -> structure: parameter
+           "destination_dir" of String, parameter "stats" of type
+           "AlignmentStats" -> structure: parameter "properly_paired" of
+           Long, parameter "multiple_alignments" of Long, parameter
            "singletons" of Long, parameter "alignment_rate" of Double,
            parameter "unmapped_reads" of Long, parameter "mapped_reads" of
            Long, parameter "total_reads" of Long

@@ -53,7 +53,7 @@
         {
             "id" : "reads_condition",
             "optional" : true,
-            "advanced" : false,
+            "advanced" : true,
             "allow_multiple" : false,
             "default_values" : [ "unspecified" ],
             "field_type" : "text"
