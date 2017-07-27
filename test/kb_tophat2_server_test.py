@@ -276,7 +276,7 @@ class kb_tophat2Test(unittest.TestCase):
     def test_run_tophat2_app_sample_set(self):
         input_params = {
             'input_ref': self.sample_set_ref,
-            'assembly_or_genome_ref': self.genome_ref,
+            'assembly_or_genome_ref': self.assembly_ref,
             'workspace_name': self.getWsName(),
             'alignment_suffix': '_alignment',
             'alignment_set_suffix': '_alignment_set',

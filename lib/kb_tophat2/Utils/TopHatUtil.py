@@ -578,11 +578,18 @@ class TopHatUtil:
         genome_index_files = os.listdir(genome_index_file_dir)
 
         log('generated genome index files: {}'.format(genome_index_files)) 
-        # genome_index_file_prefix = filter(re.compile(".*\.\d\..*").match, 
-        #                                   genome_index_files)[0].split('.')[0]
-        genome_index_file = [x for x in genome_index_files if re.match('(?!.*\.gz)',
-                                                                       x)][0]
-        genome_index_file_prefix = genome_index_file.split('.')[0]
+        genome_index_file = filter(re.compile(".*\.\d\..*").match, genome_index_files)[0]
+        if re.match('.*\.rev\.\d\..*', genome_index_file):
+            genome_index_file_prefix = genome_index_file.split('rev')[0][:-1]
+        else:
+            genome_index_file_prefix = ''
+            for prefix in genome_index_file.split('.'):
+                if prefix.isdigit():
+                    break
+                else:
+                    genome_index_file_prefix += '.' + prefix
+            genome_index_file_prefix = genome_index_file_prefix[1:]
+
         genome_index_base = genome_index_file_dir + '/' + genome_index_file_prefix
 
         input_object_info = self._get_input_object_info(params.get('input_ref'))
