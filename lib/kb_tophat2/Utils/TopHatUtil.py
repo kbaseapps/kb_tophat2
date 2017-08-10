@@ -8,6 +8,7 @@ import re
 import zipfile
 from pathos.multiprocessing import ProcessingPool as Pool
 import multiprocessing
+import traceback
 
 from Workspace.WorkspaceClient import Workspace as Workspace
 from kb_Bowtie2.kb_Bowtie2Client import kb_Bowtie2
@@ -243,30 +244,35 @@ class TopHatUtil:
         """
         _process_single_reads_library: process single reads library
         """
+        try:
+            reads_obj_type = self._get_type_from_obj_info(input_object_info['info'])
+            reads_obj_name = input_object_info['info'][1]
+            reads_files = self._get_reads_file(input_object_info['ref'], 
+                                               reads_obj_type, 
+                                               result_directory)
+            
+            tophat_result_dir = os.path.join(result_directory, 
+                                             'tophat2_result_' + reads_obj_name + 
+                                             '_' + str(int(time.time() * 100)))
+            command = self._generate_command(genome_index_base, reads_files, 
+                                             tophat_result_dir, cli_option_params)
+            self._run_command(command)
 
-        reads_obj_type = self._get_type_from_obj_info(input_object_info['info'])
-        reads_obj_name = input_object_info['info'][1]
-        reads_files = self._get_reads_file(input_object_info['ref'], 
-                                           reads_obj_type, 
-                                           result_directory)
-        
-        tophat_result_dir = os.path.join(result_directory, 
-                                         'tophat2_result_' + reads_obj_name + 
-                                         '_' + str(int(time.time() * 100)))
-        command = self._generate_command(genome_index_base, reads_files, 
-                                         tophat_result_dir, cli_option_params)
-        self._run_command(command)
+            alignment_object_name = reads_obj_name + cli_option_params.get('alignment_suffix')
+            assembly_or_genome_ref = cli_option_params.get('assembly_or_genome_ref')
+            reads_alignment_object_ref = self._save_alignment(tophat_result_dir,
+                                                              alignment_object_name,
+                                                              input_object_info['ref'],
+                                                              assembly_or_genome_ref,
+                                                              cli_option_params.get('workspace_name'),
+                                                              cli_option_params.get('reads_condition'))
 
-        alignment_object_name = reads_obj_name + cli_option_params.get('alignment_suffix')
-        assembly_or_genome_ref = cli_option_params.get('assembly_or_genome_ref')
-        reads_alignment_object_ref = self._save_alignment(tophat_result_dir,
-                                                          alignment_object_name,
-                                                          input_object_info['ref'],
-                                                          assembly_or_genome_ref,
-                                                          cli_option_params.get('workspace_name'),
-                                                          cli_option_params.get('reads_condition'))
-
-        return reads_alignment_object_ref
+            return reads_alignment_object_ref
+        except Exception as e:
+            print('Caught exception in worker')
+            traceback.print_exc()
+            print()
+            raise e
 
     def _generate_report_single_library(self, reads_alignment_object_ref, result_directory, 
                                         workspace_name):
@@ -503,8 +509,14 @@ class TopHatUtil:
         cpus = min(cli_option_params.get('num_threads'), multiprocessing.cpu_count())
         pool = Pool(ncpus=cpus)
         log('running _process_alignment_object with {} cpus'.format(cpus))
-        reads_alignment_object_refs = pool.map(self._process_single_reads_library, 
-                                               arg_1, arg_2, arg_3, arg_4)
+        try:
+            reads_alignment_object_refs = pool.map(self._process_single_reads_library, 
+                                                   arg_1, arg_2, arg_3, arg_4)
+        except Exception as e:
+            print('Caught exception in worker')
+            traceback.print_exc()
+            print()
+            raise e
 
         workspace_name = cli_option_params['workspace_name']
         reads_alignment_set_object_ref = self._save_alignment_set(reads_alignment_object_refs,
