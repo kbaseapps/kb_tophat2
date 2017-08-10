@@ -496,8 +496,8 @@ class TopHatUtil:
         alignment_set_name = set_object_name + cli_option_params['alignment_set_suffix']
 
         arg_1 = []
-        arg_2 = [genome_index_base] * 4
-        arg_3 = [result_directory] * 4
+        arg_2 = [genome_index_base] * len(reads_refs)
+        arg_3 = [result_directory] * len(reads_refs)
         arg_4 = []
         for reads_ref in reads_refs:
             reads_input_object_info = self._get_input_object_info(reads_ref['ref'])
