@@ -9,6 +9,7 @@ import zipfile
 from pathos.multiprocessing import ProcessingPool as Pool
 import multiprocessing
 import traceback
+import sys
 
 from Workspace.WorkspaceClient import Workspace as Workspace
 from kb_Bowtie2.kb_Bowtie2Client import kb_Bowtie2
@@ -266,13 +267,15 @@ class TopHatUtil:
                                                               assembly_or_genome_ref,
                                                               cli_option_params.get('workspace_name'),
                                                               cli_option_params.get('reads_condition'))
+        except:
+            log('caught exception in worker')
+            e = sys.exc_info()[0]
 
+            error_msg = 'ERROR -- {}: {}'.format(e, ''.join(traceback.format_stack()))
+
+            reads_alignment_object_ref = error_msg
+        finally:
             return reads_alignment_object_ref
-        except Exception as e:
-            print('Caught exception in worker')
-            traceback.print_exc()
-            print()
-            raise e
 
     def _generate_report_single_library(self, reads_alignment_object_ref, result_directory, 
                                         workspace_name):
@@ -509,14 +512,15 @@ class TopHatUtil:
         cpus = min(cli_option_params.get('num_threads'), multiprocessing.cpu_count())
         pool = Pool(ncpus=cpus)
         log('running _process_alignment_object with {} cpus'.format(cpus))
-        try:
-            reads_alignment_object_refs = pool.map(self._process_single_reads_library, 
-                                                   arg_1, arg_2, arg_3, arg_4)
-        except Exception as e:
-            print('Caught exception in worker')
-            traceback.print_exc()
-            print()
-            raise e
+
+        reads_alignment_object_refs = pool.map(self._process_single_reads_library, 
+                                               arg_1, arg_2, arg_3, arg_4)
+
+        for reads_alignment_object_ref in reads_alignment_object_refs:
+            if reads_alignment_object_ref.startswith('ERROR'):
+                error_msg = 'Caught exception in worker\n'
+                error_msg += '{}'.format(reads_alignment_object_ref)
+                raise ValueError(error_msg)
 
         workspace_name = cli_option_params['workspace_name']
         reads_alignment_set_object_ref = self._save_alignment_set(reads_alignment_object_refs,
