@@ -9,4 +9,4 @@ cp /kb/module/.coveragerc .
 coverage report -m
 cp .coverage /kb/module/work/
 mkdir -p /kb/module/work/kb/module/lib/
-cp -R /kb/module/lib/Tianhao-Gu/ /kb/module/work/kb/module/lib/
+cp -R /kb/module/lib/kb_tophat2/ /kb/module/work/kb/module/lib/
