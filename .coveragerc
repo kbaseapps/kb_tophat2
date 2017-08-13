@@ -1,0 +1,20 @@
+[run]
+branch = True
+
+omit =
+    /kb/module/lib/kb_tophat2/authclient.py
+    /kb/module/lib/kb_tophat2/baseclient.py
+    /kb/module/lib/kb_tophat2/kb_tophat2Client.py
+    /kb/module/lib/kb_tophat2/kb_tophat2Server.py
+source = /kb/module/lib/kb_tophat2
+
+
+[report]
+# Regexes for lines to exclude from consideration
+exclude_lines =
+    # Have to re-enable the standard pragma
+    pragma: no cover
+    # Don't complain if tests don't hit defensive assertion code:
+    raise NotImplementedError
+
+show_missing = 1
