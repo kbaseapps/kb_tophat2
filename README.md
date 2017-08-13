@@ -1,3 +1,8 @@
+Build status:
+
+master: [![Coverage Status](https://coveralls.io/repos/github/kbaseapps/kb_tophat2/badge.svg?branch=master)](https://coveralls.io/github/kbaseapps/kb_tophat2?branch=master)
+
+master:  [![Build Status](https://travis-ci.org/[YOUR_GITHUB_NAME]/kb_tophat2.svg?branch=master)](https://travis-ci.org/kbaseapps/kb_tophat2)
 
 # kb_tophat2
 ---

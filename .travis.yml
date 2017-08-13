@@ -1,6 +1,58 @@
-language: 
+language: python
+python:
+- '2.7'
+sudo: required
+services:
+- docker
+notifications:
+  email:
+    recipients:
+    - tgu@anl.gov
+    on_success: never
+    on_failure: always
 env:
+  global:
+  - secure: LxoidhFGgcOqdwJEhqRJ0fIl5u+2dHx6HlnxKOp6s0+QcKh74jvuIuY+LvPOEeuzKIgy9Pw5ChxcuE+79FVEpNwbHEiBb44px9D0YjpYpaYtgRKnMgsIGeFxMiqqac3xttNqbKBD/nsBJskbUWiFJvL3snYActgUpuNKgIslXYMkrJKXH0HOebKmF4wX96xwqoz73jJSD+t/ZFCAUIyY7QFIdkypOT1Drlb9uT13JnV3Fz10WuNn/hpP1B8C7VGvP4k54nyDz+wTcNl3hR6MTHwOFxJk8CmbzP4lLi8DGeeHX8UZpkhT7NAQ9yNAFj4xSAVfrhjCmnShbm2veXyip7uL4y5L8RTD7Dnlq7EehNvV3syhNd3atMRroScxMTdzIlTZBfc4+3pOWHLSog1r6kj+Yx3B9sgRe8802I435U2m3YZXQYzJUeT2zWg2rHE53VyXRD5zx/ECGoNp3wi2b1cN4s3CRtxnny6YIKAQYc2Avamo7IJFmYmLEeJy+gCFKNHY9wjln1srhjV2ElQO6gvhp33ZlTBzCDuzpJmJKSieDDi0wSSRMP768xflv31VC+V7xk9BFZ6ouZoRMeFxRoDBqgoivtGnRFCltvP5GNipHVMCk2QoXfkWbdK/+u/R2jVylpTTo96n8E16wtsLEPOkY3Q6krUYw+BMk/mqr48=
+branches:
+  only:
+  - master
 before_install:
+- docker version
+- python --version
+- javac -version
+- java -version
 install:
+- pip install coveralls
+- git clone https://github.com/kbase/jars
+- git clone https://github.com/kbase/kb_sdk
+- cd kb_sdk
+- make
+- make sdkbase
+- docker images
+- export PATH=$(pwd)/bin:$PATH
+- cd ../
+- git clone https://github.com/Tianhao-Gu/kb_tophat2.git
+- cd kb_tophat2
+- kb-sdk test || true
+- sed -i "s/test_token=/test_token=$TEST_TOKEN/" test_local/test.cfg
+- sed -i 's\https://appdev.kbase.us/services\https://ci.kbase.us/services\' test_local/test.cfg
+- sed -i 's\https://appdev.kbase.us/services/auth/api/legacy/KBase/Sessions/Login\https://ci.kbase.us/services/auth/api/legacy/KBase/Sessions/Login\'
+  test_local/test.cfg
+- sed -i 's/$(id -u)/0:0/' test_local/run_tests.sh
+- pwd=$(pwd)
+- echo "#!/bin/bash" >> test_local/run_subjob.sh
+- echo -e "$pwd/test_local/run_docker.sh run --rm --user 0:0 -v $pwd/test_local/subjobs/\$1/workdir:/kb/module/work
+  -v $pwd/test_local/workdir/tmp:/kb/module/work/tmp \$4 -e \"SDK_CALLBACK_URL=\$3\"
+  \$2 async" >> test_local/run_subjob.sh
+- cat test_local/run_subjob.sh
 script:
-after_script:
+- kb-sdk test
+after_success:
+- cp test_local/workdir/.coverage .
+- sudo mkdir -p /kb/module/lib/
+- sudo cp -R test_local/workdir/kb/module/lib/kb_tophat2 /kb/module/lib/
+- pwd
+- ls -l /kb/module/lib/kb_tophat2
+- cat .coverage
+- coverage report -m
+- coveralls
