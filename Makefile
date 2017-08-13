@@ -60,7 +60,7 @@ build-test-script:
 	echo 'coverage report -m' >> $(TEST_DIR)/$(TEST_SCRIPT_NAME) 
 	echo 'cp .coverage /kb/module/work/' >> $(TEST_DIR)/$(TEST_SCRIPT_NAME) 
 	echo 'mkdir -p /kb/module/work/kb/module/lib/' >> $(TEST_DIR)/$(TEST_SCRIPT_NAME) 
-	echo 'cp -R /kb/module/lib/Tianhao-Gu/ /kb/module/work/kb/module/lib/' >> $(TEST_DIR)/$(TEST_SCRIPT_NAME) 
+	echo 'cp -R /kb/module/lib/kb_tophat2/ /kb/module/work/kb/module/lib/' >> $(TEST_DIR)/$(TEST_SCRIPT_NAME) 
 	chmod +x $(TEST_DIR)/$(TEST_SCRIPT_NAME)
 
 test:
