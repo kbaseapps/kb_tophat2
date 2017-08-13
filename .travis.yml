@@ -31,7 +31,7 @@ install:
 - docker images
 - export PATH=$(pwd)/bin:$PATH
 - cd ../
-- git clone https://github.com/Tianhao-Gu/kb_tophat2.git
+- git clone https://github.com/kbaseapps/kb_tophat2.git
 - cd kb_tophat2
 - kb-sdk test || true
 - sed -i "s/test_token=/test_token=$TEST_TOKEN/" test_local/test.cfg
