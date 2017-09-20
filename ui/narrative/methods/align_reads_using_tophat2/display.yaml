@@ -2,7 +2,7 @@
 # Define basic display information
 #
 
-name     : Align Reads using TopHat2 - v1.0.0
+name     : Align Reads using TopHat2 - v1.0.1
 tooltip  : |
     Align sequencing reads to a reference genome using TopHat2 to identify exon-exon splice junctions.
 
@@ -107,10 +107,10 @@ parameters :
             Set the condition associated with the input reads object. This is required for a single sample, but ignored for sets of samples, since that is included in the set.
 description : |
     <p>This App aligns the sequencing reads for a set of two or more samples to a genome using TopHat2 in order to identify splice junctions between exons with the help of Bowtie2 mapping program. Alternatively, if the user has only a single sample of reads or set of reads, this App will take single-end or paired-end library object or reads set instead of a sample set.</p>
-     <p>In addition, it outputs the Qualimap generated BAM alignment QC report that includes global summary such as total number of mapped reads, mean samples coverage, mean samples GC-content, mean samples mapping quality, and sample statistics for each sample along with PCA and coverage statistics in histograms.</p>
+    <p>In addition, it outputs the Qualimap generated BAM alignment QC report that includes global summary such as total number of mapped reads, mean samples coverage, mean samples GC-content, mean samples mapping quality, and sample statistics for each sample along with PCA and coverage statistics in histograms.</p>
     <p><strong>NOTE:</strong> This method is one of the steps of the <a href= "http://kbase.us/rna-seq/"> KBase RNA-seq Pipeline </a>, however it can also be run standalone for one or more samples.</p>
   
-    <p><strong>Team members who developed & deployed algorithm in KBase:</strong> Srividya Ramakrishnan, Sunita Kumari, Shinjae Yoo, Priya Ranjan, Jim Thomason, Vivek Kumar, Tianhao Gu</p>
+    <p><strong>Team members who developed & deployed algorithm in KBase:</strong> Tianhao Gu, Christopher Henry, Shane Canon, Stephen Chan, Jason Baumohl, Sean McCorkle, Sunita Kumari, Shinjae Yoo, Priya Ranjan, Vivek Kumar</p>
     
 publications :
 

@@ -22,9 +22,9 @@ class kb_tophat2:
     # state. A method could easily clobber the state set by another while
     # the latter method is running.
     ######################################### noqa
-    VERSION = "1.0.0"
+    VERSION = "1.0.1"
     GIT_URL = "https://github.com/Tianhao-Gu/kb_tophat2.git"
-    GIT_COMMIT_HASH = "65d0cb9a682ecebaa071bb2e75602d1a9b82cbc3"
+    GIT_COMMIT_HASH = "96f4b6ed336c7fe6e8fea536b0b3d2bfe6adef7f"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
