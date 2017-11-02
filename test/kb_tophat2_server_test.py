@@ -25,7 +25,7 @@ from AssemblyUtil.AssemblyUtilClient import AssemblyUtil
 from ReadsUtils.ReadsUtilsClient import ReadsUtils
 from DataFileUtil.DataFileUtilClient import DataFileUtil
 from GenomeFileUtil.GenomeFileUtilClient import GenomeFileUtil
-
+from SetAPI.SetAPIServiceClient import SetAPI
 
 class kb_tophat2Test(unittest.TestCase):
 
@@ -59,6 +59,7 @@ class kb_tophat2Test(unittest.TestCase):
         cls.serviceImpl = kb_tophat2(cls.cfg)
         cls.scratch = cls.cfg['scratch']
         cls.callback_url = os.environ['SDK_CALLBACK_URL']
+        cls.srv_wiz_url = cls.cfg['srv-wiz-url']
 
         suffix = int(time.time() * 1000)
         cls.wsName = "test_kb_tophat2_" + str(suffix)
@@ -147,6 +148,41 @@ class kb_tophat2Test(unittest.TestCase):
 
         dfu_oi = cls.dfu.save_objects(save_object_params)[0]
         cls.sample_set_ref = str(dfu_oi[6]) + '/' + str(dfu_oi[0]) + '/' + str(dfu_oi[4])
+
+
+    def loadReadsSet(self):
+        if hasattr(self.__class__, 'reads_set_ref'):
+            return self.__class__.reads_set_ref
+        pe_reads_ref = self.pe_reads_ref
+        reads_set_name = 'TophatTestReadsSet'
+        # create the set object
+
+        reads_set_data = {
+            'description': 'Reads Set for testing Bowtie',
+            'items': [{
+                'ref': pe_reads_ref,
+                'label': 'rs1'
+            }, {
+                'ref': pe_reads_ref,
+                'label': 'rs2'
+            }, {
+                'ref': pe_reads_ref,
+                'label': 'rs3'
+            }
+            ]
+        }
+        # test a save
+        set_api = SetAPI(self.srv_wiz_url)
+        res = set_api.save_reads_set_v1({
+            'data': reads_set_data,
+            'output_object_name': reads_set_name,
+            'workspace': self.getWsName()
+        })
+        reads_set_ref = res['set_ref']
+
+        # reads_set_ref = '5264/52/1'
+        print('Loaded ReadsSet: ' + reads_set_ref)
+        return reads_set_ref
 
     def getWsClient(self):
         return self.__class__.wsClients
@@ -304,3 +340,39 @@ class kb_tophat2Test(unittest.TestCase):
                                                    result.get('reads_alignment_object_ref')}]})['data'][0]['data']
         self.assertTrue('items' in alignment_set_data)
         self.assertTrue('description' in alignment_set_data)
+
+    def test_run_tophat2_app_reads_set(self):
+        reads_set_ref = self.loadReadsSet()
+        input_params = {
+            'input_ref': reads_set_ref,
+            'assembly_or_genome_ref': self.assembly_ref,
+            'workspace_name': self.getWsName(),
+            'alignment_suffix': '_alignment',
+            'alignment_set_suffix': '_alignment_set',
+            'reads_condition': 'test_condition',
+            'read_mismatches': 2,
+            'read_gap_length': 2,
+            'read_edit_dist': 2,
+            'min_intron_length': 70,
+            'max_intron_length': 500000,
+            'min_anchor_length': 8,
+            'report_secondary_alignments': 1,
+            'no_coverage_search': 1,
+            'library_type': 'fr-unstranded',
+            'preset_options': 'b2-very-fast'
+        }
+
+        result = self.getImpl().run_tophat2_app(self.getContext(), input_params)[0]
+
+        self.assertTrue('result_directory' in result)
+        result_files = os.listdir(result['result_directory'])
+        print result_files
+        self.assertTrue('reads_alignment_object_ref' in result)
+        alignment_set_data = self.ws.get_objects2({'objects':
+                                                  [{'ref':
+                                                   result.get('reads_alignment_object_ref')}]})['data'][0]['data']
+        self.assertTrue('items' in alignment_set_data)
+        self.assertTrue('description' in alignment_set_data)
+
+
+
