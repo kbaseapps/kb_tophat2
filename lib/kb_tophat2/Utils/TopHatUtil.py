@@ -465,20 +465,14 @@ class TopHatUtil:
         """
         obj_type = self._get_type_from_obj_info(info)
         refs = list()
-        if "KBaseSets.ReadsSet" in obj_type:
+        if "KBaseSets.ReadsSet" in obj_type or "KBaseRNASeq.RNASeqSampleSet" in obj_type:
             print("Looking up reads references in ReadsSet object")
             reads_set = self.set_client.get_reads_set_v1({'ref': ref,
-                                                          'include_item_info': 0})
+                                                          'include_item_info': 0,
+                                                          'include_set_item_ref_paths': 1})
             for reads in reads_set["data"]["items"]:
-                refs.append({'ref': reads['ref'],
+                refs.append({'ref': reads['ref_path'],
                              'condition': reads['label']
-                             })
-        elif "KBaseRNASeq.RNASeqSampleSet" in obj_type:
-            print("Looking up reads references in RNASeqSampleSet object")
-            sample_set = self.ws.get_objects2({"objects": [{"ref": ref}]})["data"][0]["data"]
-            for i in range(len(sample_set["sample_ids"])):
-                refs.append({'ref': sample_set["sample_ids"][i],
-                             'condition': sample_set["condition"][i]
                              })
         else:
             raise ValueError("Unable to fetch reads reference from object {} "
@@ -543,7 +537,7 @@ class TopHatUtil:
         self.qualimap = kb_QualiMap(self.callback_url, service_ver='dev')
         self.ru = ReadsUtils(self.callback_url)
         self.dfu = DataFileUtil(self.callback_url)
-        self.set_client = SetAPI(self.srv_wiz_url)
+        self.set_client = SetAPI(self.srv_wiz_url, service_ver='dev')
 
     def run_tophat2_app(self, params):
         """
