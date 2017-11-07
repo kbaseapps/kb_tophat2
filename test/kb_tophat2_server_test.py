@@ -327,7 +327,7 @@ class kb_tophat2Test(unittest.TestCase):
             'library_type': 'fr-unstranded',
             'preset_options': 'b2-very-fast'
         }
-        '''
+
         result = self.getImpl().run_tophat2_app(self.getContext(), ss_input_params)[0]
 
         self.assertTrue('result_directory' in result)
@@ -339,7 +339,7 @@ class kb_tophat2Test(unittest.TestCase):
                                                    result.get('reads_alignment_object_ref')}]})['data'][0]['data']
         self.assertTrue('items' in alignment_set_data)
         self.assertTrue('description' in alignment_set_data)
-        '''
+
 
     def test_run_tophat2_app_reads_set(self):
         reads_set_ref = self.loadReadsSet()
