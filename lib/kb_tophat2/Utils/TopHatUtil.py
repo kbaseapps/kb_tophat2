@@ -532,12 +532,12 @@ class TopHatUtil:
         self.scratch = config['scratch']
         self.srv_wiz_url = config['srv-wiz-url']
         self.ws = Workspace(self.ws_url, token=self.token)
-        self.bt = kb_Bowtie2(self.callback_url, service_ver='dev')
-        self.rau = ReadsAlignmentUtils(self.callback_url, service_ver='dev')
+        self.bt = kb_Bowtie2(self.callback_url)
+        self.rau = ReadsAlignmentUtils(self.callback_url)
         self.qualimap = kb_QualiMap(self.callback_url, service_ver='dev')
         self.ru = ReadsUtils(self.callback_url)
         self.dfu = DataFileUtil(self.callback_url)
-        self.set_client = SetAPI(self.srv_wiz_url, service_ver='dev')
+        self.set_client = SetAPI(self.srv_wiz_url)
 
     def run_tophat2_app(self, params):
         """
