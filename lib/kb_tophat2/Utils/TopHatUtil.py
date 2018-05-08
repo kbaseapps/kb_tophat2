@@ -203,7 +203,7 @@ class TopHatUtil:
 
         log('starting saving ReadsAlignment object')
 
-        bam_file_path = os.path.join(tophat_result_dir, 'accepted_hits.bam')
+        bam_file_path = self._merge_bam_files(tophat_result_dir)
         destination_ref = workspace_name + '/' + alignment_name
         if reads_condition:
             condition = reads_condition
@@ -221,6 +221,17 @@ class TopHatUtil:
         reads_alignment_object_ref = self.rau.upload_alignment(upload_alignment_params)['obj_ref']
 
         return reads_alignment_object_ref
+
+    def _merge_bam_files(self, tophat_result_dir, merged_file_name="merged_hits.bam"):
+        """
+        Tophat splits results into a mapped file and unmapped file while the alignment
+        upload expects these to be in one file (like hisat and bowtie produces). This uses
+        samtools to merge the files.
+        """
+        command = 'samtools merge {}/{} {}/accepted_hits.bam {}/unmapped.bam'.format(
+            tophat_result_dir, merged_file_name, tophat_result_dir, tophat_result_dir)
+        self._run_command(command)
+        return os.path.join(tophat_result_dir, merged_file_name)
 
     def _save_alignment_set(self, reads_alignment_object_refs, workspace_name, alignment_set_name,
                             sampleset_id):
