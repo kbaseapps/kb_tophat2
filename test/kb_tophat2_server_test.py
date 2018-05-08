@@ -125,7 +125,8 @@ class kb_tophat2Test(unittest.TestCase):
         genome_object_name = 'test_Genome'
         cls.genome_ref = cls.gfu.genbank_to_genome({'file': {'path': genbank_file_path},
                                                     'workspace_name': cls.wsName,
-                                                    'genome_name': genome_object_name
+                                                    'genome_name': genome_object_name,
+                                                    'generate_missing_genes': 1,
                                                     })['genome_ref']
 
         # upload sample set object
@@ -260,7 +261,7 @@ class kb_tophat2Test(unittest.TestCase):
 
         self.assertTrue('result_directory' in result)
         result_files = os.listdir(result['result_directory'])
-        print result_files
+        print(result_files)
         self.assertTrue(any(re.match('bowtie2_index_*', file) for file in result_files))
         self.assertTrue(any(re.match('reads_file_*', file) for file in result_files))
         self.assertTrue(any(re.match('tophat2_result_*', file) for file in result_files))
@@ -296,7 +297,7 @@ class kb_tophat2Test(unittest.TestCase):
 
         self.assertTrue('result_directory' in result)
         result_files = os.listdir(result['result_directory'])
-        print result_files
+        print(result_files)
         self.assertTrue(any(re.match('bowtie2_index_*', file) for file in result_files))
         self.assertTrue(any(re.match('reads_file_*', file) for file in result_files))
         self.assertTrue(any(re.match('tophat2_result_*', file) for file in result_files))
@@ -332,7 +333,7 @@ class kb_tophat2Test(unittest.TestCase):
 
         self.assertTrue('result_directory' in result)
         result_files = os.listdir(result['result_directory'])
-        print result_files
+        print(result_files)
         self.assertTrue('reads_alignment_object_ref' in result)
         alignment_set_data = self.ws.get_objects2({'objects': 
                                                   [{'ref': 
@@ -366,7 +367,7 @@ class kb_tophat2Test(unittest.TestCase):
 
         self.assertTrue('result_directory' in result)
         result_files = os.listdir(result['result_directory'])
-        print result_files
+        print(result_files)
         self.assertTrue('reads_alignment_object_ref' in result)
         alignment_set_data = self.ws.get_objects2({'objects':
                                                   [{'ref':
