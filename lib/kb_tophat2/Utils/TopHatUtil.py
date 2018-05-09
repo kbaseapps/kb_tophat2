@@ -234,7 +234,7 @@ class TopHatUtil:
         return os.path.join(tophat_result_dir, merged_file_name)
 
     def _save_alignment_set(self, reads_alignment_object_refs, workspace_name, alignment_set_name,
-                            sampleset_id):
+                            conditions):
         """
         _save_alignment_set: upload AlignmentSet object
         """
@@ -242,8 +242,8 @@ class TopHatUtil:
         log('starting saving ReadsAlignmentSet object')
 
         items = []
-        for reads_alignment_object_ref in reads_alignment_object_refs:
-            items.append({'ref': reads_alignment_object_ref})
+        for reads_alignment_object_ref, condition in zip(reads_alignment_object_refs, conditions):
+            items.append({'ref': reads_alignment_object_ref, 'label': condition})
         alignment_set_data = {'description': 'Alignments using TopHat2', 
                               'items': items}
 
@@ -493,10 +493,12 @@ class TopHatUtil:
         arg_2 = [genome_index_base] * len(reads_refs)
         arg_3 = [result_directory] * len(reads_refs)
         arg_4 = []
+        conditions = []
         for reads_ref in reads_refs:
             reads_input_object_info = self._get_input_object_info(reads_ref['ref'])
             option_params = cli_option_params.copy()
             option_params['reads_condition'] = reads_ref['condition']
+            conditions.append(reads_ref['condition'])
             arg_1.append(reads_input_object_info)
             arg_4.append(option_params)
 
@@ -517,7 +519,7 @@ class TopHatUtil:
         reads_alignment_set_object_ref = self._save_alignment_set(reads_alignment_object_refs,
                                                                   workspace_name,
                                                                   alignment_set_name,
-                                                                  input_object_info['ref'])
+                                                                  conditions)
 
         return reads_alignment_set_object_ref
 
@@ -531,7 +533,7 @@ class TopHatUtil:
         self.ws = Workspace(self.ws_url, token=self.token)
         self.bt = kb_Bowtie2(self.callback_url)
         self.rau = ReadsAlignmentUtils(self.callback_url)
-        self.qualimap = kb_QualiMap(self.callback_url, service_ver='dev')
+        self.qualimap = kb_QualiMap(self.callback_url)
         self.ru = ReadsUtils(self.callback_url)
         self.dfu = DataFileUtil(self.callback_url)
         self.set_client = SetAPI(self.srv_wiz_url)
