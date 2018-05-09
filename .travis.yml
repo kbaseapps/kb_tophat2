@@ -4,55 +4,24 @@ python:
 sudo: required
 services:
 - docker
-notifications:
-  email:
-    recipients:
-    - tgu@anl.gov
-    on_success: never
-    on_failure: always
-env:
-  global:
-  - secure: H5SrQzEvvasPizPuyGRK3tY9aQHMiyQEVv0L11lryX79gzlVRbw1k7uke/+EgfTJ+0MeQS/j2l10t6UVrmlXMKxwcgmWBQD+JrO9Ua2YIEGpIoXl/7N3LFHpowvFpLMcmw9iQtLrvFyKalDxhdUPcXxcttpEy+v42Ba6wmvq2T8l+CYTP+OefZJS8vUFWa2oVYfUMPwctxN+ooMQ6JPNamTVp3REG5S1mNi8+PxFqKcwhXYWV5g82IEs4YEDr+9h2jfqafssh/47iTaxLlO7q/XzQtN+meY+1GlkNl/8uQRzm/fHW9CAlG5DCGaB57sr3h3/rpxBne1Pi16fmwNdkeg1Y+nC3G65qmMdm5ZfploufINoFyLpdk+eUoq7sdlOKO9lwIu2wXv0vahJ2O5Y4YyyiQE9ylF1YfHKHnydQu93kcv7USFw3EPnSqHeN4/0YE7jfeh8ey/LAHJcnviWduJ3+ISNa+3sG5x4FfNCOkDbcgOM+YWs3+OASs+QNciGudCWb92LKZD7wXSVe3btE3NweMk6GSm/uyuMl6bUCLcQbLuZwjroWnwGaMy3Wk69XMNDHMXUDzkxEv5RxNCNIEJdmQ0RfwIqWXmtTYVV6a/LTXr6QWMGTrXQYm4chqmFB5Xvp+jiPsp7FVrlS25V/7XWQZxZ9oSSyoPZ8BVJGdM=
-branches:
-  only:
-  - master
-before_install:
-- docker version
-- python --version
-- javac -version
-- java -version
 install:
-- pip install coveralls
-- git clone https://github.com/kbase/jars
-- git clone https://github.com/kbase/kb_sdk
-- cd kb_sdk
-- make
-- make sdkbase
-- docker images
-- export PATH=$(pwd)/bin:$PATH
-- cd ../
-- git clone https://github.com/kbaseapps/kb_tophat2.git
-- cd kb_tophat2
+- docker pull kbase/kb-sdk
+- docker run kbase/kb-sdk genscript > $HOME/bin/kb-sdk
+- chmod 755 $HOME/bin/kb-sdk
+- export PATH=$PATH:$HOME/bin/kb-sdk
+- kb-sdk sdkbase
 - kb-sdk test || true
+- make build-test-script
 - sed -i "s/test_token=/test_token=$TEST_TOKEN/" test_local/test.cfg
-# - sed -i 's\https://appdev.kbase.us/services\https://ci.kbase.us/services\' test_local/test.cfg
-# - sed -i 's\https://appdev.kbase.us/services/auth/api/legacy/KBase/Sessions/Login\https://ci.kbase.us/services/auth/api/legacy/KBase/Sessions/Login\'
-#   test_local/test.cfg
 - sed -i 's/$(id -u)/0:0/' test_local/run_tests.sh
-- pwd=$(pwd)
-- echo "#!/bin/bash" >> test_local/run_subjob.sh
-- echo -e "$pwd/test_local/run_docker.sh run --rm --user 0:0 -v $pwd/test_local/subjobs/\$1/workdir:/kb/module/work
-  -v $pwd/test_local/workdir/tmp:/kb/module/work/tmp \$4 -e \"SDK_CALLBACK_URL=\$3\"
-  \$2 async" >> test_local/run_subjob.sh
-- cat test_local/run_subjob.sh
 script:
 - kb-sdk test
 after_success:
 - cp test_local/workdir/.coverage .
 - sudo mkdir -p /kb/module/lib/
 - sudo cp -R test_local/workdir/kb/module/lib/kb_tophat2 /kb/module/lib/
-- pwd
-- ls -l /kb/module/lib/kb_tophat2
-- cat .coverage
 - coverage report -m
 - coveralls
+env:
+  global:
+    secure: H6s96Gcx/y+gXCtbrGKKkj81geHc3sOYrQYCMy8eTnHTTd+c3OJlvNN3tHEb0Yy+cZrXFfFam/+ZHY5DAjK/V/LUH5DwgFeP0MDHMd7gp/0pJ9FQVkvwu8tx8Z85HAdOzV78aF7fKyTe+eH2DjNiRGO3Cv7bV3+dGPYG8qsyQVXXEse1tSIOph9Ykjh21Sv29JifO4W9QswbWea+2ZzvnwY9iUxxJgwaJh15P2CAPMHZRyWaJLvcA8Aj4n4rbD1BD+tXY7K2lXm2x/pxbMSn0yLCDEQfqG1Pc6TfCWVyVOkugvaVhKtofSyACRdlVieP9iPhWFl3xiookjLE4cQsVW/3t9WrjccHIcCF4V0vpBn5r78aeTH9Aa+TPksrt8ovcvtYSBFyokbhRf6WfCzl7m83DmwLe0JTRXQ5AXfUQG3uxJbuPpdXht1J52rZEpaS6TWiwspa74lUrOK8B0Bw4p1EDViojQS6JQ785jFcTHz/KcmujRLTiLvt78K/yPU6b0yI/aa8V+4Nq6M6gHbIvIItvXRgaTweDajbFplOWH3zOuJS8bshEXYekv7idw0zqogDGyjLusV5pJxt/YIdt9aJNjHuhrI20DURJH3KbIot/LWCDLZa7tODdOX6kscyIRLDD8di05Srb1dVQe+KaJIbWDpZ+EspFSp8HKNV0E8=
