@@ -256,32 +256,42 @@ class TopHatUtil:
 
         return alignment_set_object_ref
 
-    def _process_single_reads_library(self, input_object_info, genome_index_base,
+    def _process_single_reads_library(self, input_object_info, genome_index_base, 
                                       result_directory, cli_option_params):
         """
         _process_single_reads_library: process single reads library
         """
-        reads_obj_type = self._get_type_from_obj_info(input_object_info['info'])
-        reads_obj_name = input_object_info['info'][1]
-        reads_files = self._get_reads_file(input_object_info['ref'],
-                                           reads_obj_type,
-                                           result_directory)
-        tophat_result_dir = os.path.join(result_directory,
-                                         'tophat2_result_' + reads_obj_name +
-                                         '_' + str(int(time.time() * 100)))
-        command = self._generate_command(genome_index_base, reads_files,
-                                         tophat_result_dir, cli_option_params)
-        self._run_command(command)
+        try:
+            reads_obj_type = self._get_type_from_obj_info(input_object_info['info'])
+            reads_obj_name = input_object_info['info'][1]
+            reads_files = self._get_reads_file(input_object_info['ref'], 
+                                               reads_obj_type, 
+                                               result_directory)
+            
+            tophat_result_dir = os.path.join(result_directory, 
+                                             'tophat2_result_' + reads_obj_name + 
+                                             '_' + str(int(time.time() * 100)))
+            command = self._generate_command(genome_index_base, reads_files, 
+                                             tophat_result_dir, cli_option_params)
+            self._run_command(command)
 
-        alignment_object_name = reads_obj_name + cli_option_params.get('alignment_suffix')
-        assembly_or_genome_ref = cli_option_params.get('assembly_or_genome_ref')
-        reads_alignment_object_ref = self._save_alignment(tophat_result_dir,
-                                                          alignment_object_name,
-                                                          input_object_info['ref'],
-                                                          assembly_or_genome_ref,
-                                                          cli_option_params.get('workspace_name'),
-                                                          cli_option_params.get('reads_condition'))
-        return reads_alignment_object_ref
+            alignment_object_name = reads_obj_name + cli_option_params.get('alignment_suffix')
+            assembly_or_genome_ref = cli_option_params.get('assembly_or_genome_ref')
+            reads_alignment_object_ref = self._save_alignment(tophat_result_dir,
+                                                              alignment_object_name,
+                                                              input_object_info['ref'],
+                                                              assembly_or_genome_ref,
+                                                              cli_option_params.get('workspace_name'),
+                                                              cli_option_params.get('reads_condition'))
+        except:
+            log('caught exception in worker')
+            e = sys.exc_info()[0]
+
+            error_msg = 'ERROR -- {}: {}'.format(e, ''.join(traceback.format_stack()))
+
+            reads_alignment_object_ref = error_msg
+        finally:
+            return reads_alignment_object_ref
 
     def _generate_report_single_library(self, reads_alignment_object_ref, result_directory, 
                                         workspace_name):
@@ -472,10 +482,13 @@ class TopHatUtil:
         """
         _process_set_reads_library: process set reads library
         """
+
         reads_refs = self.fetch_reads_refs_from_sampleset(input_object_info['ref'],
                                                           input_object_info['info'])
+
         set_object_name = input_object_info['info'][1]
         alignment_set_name = set_object_name + cli_option_params['alignment_set_suffix']
+
         arg_1 = []
         arg_2 = [genome_index_base] * len(reads_refs)
         arg_3 = [result_directory] * len(reads_refs)
@@ -492,10 +505,16 @@ class TopHatUtil:
         cpus = min(cli_option_params.get('num_threads'), multiprocessing.cpu_count())
         pool = Pool(ncpus=cpus)
         log('running _process_alignment_object with {} cpus'.format(cpus))
-        reads_alignment_object_refs = pool.map(
-            catch_fn_error(self._process_single_reads_library),
-            arg_1, arg_2, arg_3, arg_4
-        )
+
+        reads_alignment_object_refs = pool.map(self._process_single_reads_library, 
+                                               arg_1, arg_2, arg_3, arg_4)
+
+        for reads_alignment_object_ref in reads_alignment_object_refs:
+            if reads_alignment_object_ref.startswith('ERROR'):
+                error_msg = 'Caught exception in worker\n'
+                error_msg += '{}'.format(reads_alignment_object_ref)
+                raise ValueError(error_msg)
+
         workspace_name = cli_option_params['workspace_name']
         reads_alignment_set_object_ref = self._save_alignment_set(reads_alignment_object_refs,
                                                                   workspace_name,
@@ -567,42 +586,36 @@ class TopHatUtil:
                                                        params.get('workspace_name'))
         genome_index_files = os.listdir(genome_index_file_dir)
 
-        log('generated genome index files: {}'.format(genome_index_files)) 
-        genome_index_file = filter(re.compile(".*\.\d\..*").match, genome_index_files)[0]
-        if re.match('.*\.rev\.\d\..*', genome_index_file):
-            genome_index_file_prefix = genome_index_file.split('rev')[0][:-1]
-        else:
-            genome_index_file_prefix = ''
-            for prefix in genome_index_file.split('.'):
-                if prefix.isdigit():
-                    break
-                else:
-                    genome_index_file_prefix += '.' + prefix
-            genome_index_file_prefix = genome_index_file_prefix[1:]
+        log('generated genome index files: {}'.format(genome_index_files))
+        genome_index_base = ""
+        for index_file in genome_index_files:
+            match = re.match('(.*)\.(rev\.)?\d\.\w+', index_file)
+            # should match Bdistachyon_v3.1.assembly.3.bt2 or Bdistachyon_v3.1.assembly.rev.1.bt2
+            # but not bowtie2_index_153005139683.tar.gz
+            # and return Bdistachyon_v3.1.assembly as group 1
+            if match:
+                genome_index_base = genome_index_file_dir + '/' + match.group(1)
+                break
 
-        genome_index_base = genome_index_file_dir + '/' + genome_index_file_prefix
+        if not genome_index_base:
+            # this prefix is a required TopHat parameter
+            raise RuntimeError("Unable to parse Bowtie index files")
 
         input_object_info = self._get_input_object_info(params.get('input_ref'))
 
         if input_object_info['run_mode'] == 'single_library':
-            process = catch_fn_error(self._process_single_reads_library)
-            reads_alignment_object_ref = process(
-                input_object_info,
-                genome_index_base,
-                result_directory,
-                params
-            )
+            reads_alignment_object_ref = self._process_single_reads_library(input_object_info, 
+                                                                            genome_index_base,
+                                                                            result_directory,
+                                                                            params)
             report_output = self._generate_report_single_library(reads_alignment_object_ref,
                                                                  result_directory,
                                                                  params.get('workspace_name'))
         elif input_object_info['run_mode'] == 'sample_set':
-            proc_fn = catch_fn_error(self._process_set_reads_library)
-            reads_alignment_object_ref = proc_fn(
-                input_object_info,
-                genome_index_base,
-                result_directory,
-                params
-            )
+            reads_alignment_object_ref = self._process_set_reads_library(input_object_info,
+                                                                         genome_index_base,
+                                                                         result_directory,
+                                                                         params)
             report_output = self._generate_report_sets_library(reads_alignment_object_ref,
                                                                result_directory,
                                                                params.get('workspace_name'))
@@ -613,19 +626,3 @@ class TopHatUtil:
         returnVal.update(report_output)
 
         return returnVal
-
-
-# Utility functions
-
-def catch_fn_error(fn):
-    """
-    Catch any error from running a function and print the full stacktrace.
-    This is useful for multiprocess function calls that lose their stacktrace after they are forked
-    and throw an error.
-    """
-    def wrapped(*args):
-        try:
-            fn(*args)
-        except:
-            raise Exception("".join(traceback.format_exception(*sys.exc_info())))
-    return wrapped
