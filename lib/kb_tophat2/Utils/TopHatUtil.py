@@ -256,42 +256,32 @@ class TopHatUtil:
 
         return alignment_set_object_ref
 
-    def _process_single_reads_library(self, input_object_info, genome_index_base, 
+    def _process_single_reads_library(self, input_object_info, genome_index_base,
                                       result_directory, cli_option_params):
         """
         _process_single_reads_library: process single reads library
         """
-        try:
-            reads_obj_type = self._get_type_from_obj_info(input_object_info['info'])
-            reads_obj_name = input_object_info['info'][1]
-            reads_files = self._get_reads_file(input_object_info['ref'], 
-                                               reads_obj_type, 
-                                               result_directory)
-            
-            tophat_result_dir = os.path.join(result_directory, 
-                                             'tophat2_result_' + reads_obj_name + 
-                                             '_' + str(int(time.time() * 100)))
-            command = self._generate_command(genome_index_base, reads_files, 
-                                             tophat_result_dir, cli_option_params)
-            self._run_command(command)
+        reads_obj_type = self._get_type_from_obj_info(input_object_info['info'])
+        reads_obj_name = input_object_info['info'][1]
+        reads_files = self._get_reads_file(input_object_info['ref'],
+                                           reads_obj_type,
+                                           result_directory)
+        tophat_result_dir = os.path.join(result_directory,
+                                         'tophat2_result_' + reads_obj_name +
+                                         '_' + str(int(time.time() * 100)))
+        command = self._generate_command(genome_index_base, reads_files,
+                                         tophat_result_dir, cli_option_params)
+        self._run_command(command)
 
-            alignment_object_name = reads_obj_name + cli_option_params.get('alignment_suffix')
-            assembly_or_genome_ref = cli_option_params.get('assembly_or_genome_ref')
-            reads_alignment_object_ref = self._save_alignment(tophat_result_dir,
-                                                              alignment_object_name,
-                                                              input_object_info['ref'],
-                                                              assembly_or_genome_ref,
-                                                              cli_option_params.get('workspace_name'),
-                                                              cli_option_params.get('reads_condition'))
-        except:
-            log('caught exception in worker')
-            e = sys.exc_info()[0]
-
-            error_msg = 'ERROR -- {}: {}'.format(e, ''.join(traceback.format_stack()))
-
-            reads_alignment_object_ref = error_msg
-        finally:
-            return reads_alignment_object_ref
+        alignment_object_name = reads_obj_name + cli_option_params.get('alignment_suffix')
+        assembly_or_genome_ref = cli_option_params.get('assembly_or_genome_ref')
+        reads_alignment_object_ref = self._save_alignment(tophat_result_dir,
+                                                          alignment_object_name,
+                                                          input_object_info['ref'],
+                                                          assembly_or_genome_ref,
+                                                          cli_option_params.get('workspace_name'),
+                                                          cli_option_params.get('reads_condition'))
+        return reads_alignment_object_ref
 
     def _generate_report_single_library(self, reads_alignment_object_ref, result_directory, 
                                         workspace_name):
@@ -482,13 +472,10 @@ class TopHatUtil:
         """
         _process_set_reads_library: process set reads library
         """
-
         reads_refs = self.fetch_reads_refs_from_sampleset(input_object_info['ref'],
                                                           input_object_info['info'])
-
         set_object_name = input_object_info['info'][1]
         alignment_set_name = set_object_name + cli_option_params['alignment_set_suffix']
-
         arg_1 = []
         arg_2 = [genome_index_base] * len(reads_refs)
         arg_3 = [result_directory] * len(reads_refs)
@@ -505,16 +492,10 @@ class TopHatUtil:
         cpus = min(cli_option_params.get('num_threads'), multiprocessing.cpu_count())
         pool = Pool(ncpus=cpus)
         log('running _process_alignment_object with {} cpus'.format(cpus))
-
-        reads_alignment_object_refs = pool.map(self._process_single_reads_library, 
-                                               arg_1, arg_2, arg_3, arg_4)
-
-        for reads_alignment_object_ref in reads_alignment_object_refs:
-            if reads_alignment_object_ref.startswith('ERROR'):
-                error_msg = 'Caught exception in worker\n'
-                error_msg += '{}'.format(reads_alignment_object_ref)
-                raise ValueError(error_msg)
-
+        reads_alignment_object_refs = pool.map(
+            catch_fn_error(self._process_single_reads_library),
+            arg_1, arg_2, arg_3, arg_4
+        )
         workspace_name = cli_option_params['workspace_name']
         reads_alignment_set_object_ref = self._save_alignment_set(reads_alignment_object_refs,
                                                                   workspace_name,
@@ -604,18 +585,24 @@ class TopHatUtil:
         input_object_info = self._get_input_object_info(params.get('input_ref'))
 
         if input_object_info['run_mode'] == 'single_library':
-            reads_alignment_object_ref = self._process_single_reads_library(input_object_info, 
-                                                                            genome_index_base,
-                                                                            result_directory,
-                                                                            params)
+            process = catch_fn_error(self._process_single_reads_library)
+            reads_alignment_object_ref = process(
+                input_object_info,
+                genome_index_base,
+                result_directory,
+                params
+            )
             report_output = self._generate_report_single_library(reads_alignment_object_ref,
                                                                  result_directory,
                                                                  params.get('workspace_name'))
         elif input_object_info['run_mode'] == 'sample_set':
-            reads_alignment_object_ref = self._process_set_reads_library(input_object_info,
-                                                                         genome_index_base,
-                                                                         result_directory,
-                                                                         params)
+            proc_fn = catch_fn_error(self._process_set_reads_library)
+            reads_alignment_object_ref = proc_fn(
+                input_object_info,
+                genome_index_base,
+                result_directory,
+                params
+            )
             report_output = self._generate_report_sets_library(reads_alignment_object_ref,
                                                                result_directory,
                                                                params.get('workspace_name'))
@@ -626,3 +613,19 @@ class TopHatUtil:
         returnVal.update(report_output)
 
         return returnVal
+
+
+# Utility functions
+
+def catch_fn_error(fn):
+    """
+    Catch any error from running a function and print the full stacktrace.
+    This is useful for multiprocess function calls that lose their stacktrace after they are forked
+    and throw an error.
+    """
+    def wrapped(*args):
+        try:
+            fn(*args)
+        except:
+            raise Exception("".join(traceback.format_exception(*sys.exc_info())))
+    return wrapped
