@@ -586,20 +586,16 @@ class TopHatUtil:
                                                        params.get('workspace_name'))
         genome_index_files = os.listdir(genome_index_file_dir)
 
-        log('generated genome index files: {}'.format(genome_index_files)) 
-        genome_index_file = filter(re.compile(".*\.\d\..*").match, genome_index_files)[0]
-        if re.match('.*\.rev\.\d\..*', genome_index_file):
-            genome_index_file_prefix = genome_index_file.split('rev')[0][:-1]
-        else:
-            genome_index_file_prefix = ''
-            for prefix in genome_index_file.split('.'):
-                if prefix.isdigit():
-                    break
-                else:
-                    genome_index_file_prefix += '.' + prefix
-            genome_index_file_prefix = genome_index_file_prefix[1:]
+        log('generated genome index files: {}'.format(genome_index_files))
+        genome_index_base = ""
+        for index_file in genome_index_files:
+            match = re.match('(.*)\.(rev\.)?\d\.\w+', index_file)
+            if match:
+                genome_index_base = genome_index_file_dir + '/' + match.group(1)
+                break
 
-        genome_index_base = genome_index_file_dir + '/' + genome_index_file_prefix
+        if not genome_index_base:
+            raise RuntimeError("Unable to parse Bowtie index files")
 
         input_object_info = self._get_input_object_info(params.get('input_ref'))
 
