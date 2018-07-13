@@ -590,11 +590,15 @@ class TopHatUtil:
         genome_index_base = ""
         for index_file in genome_index_files:
             match = re.match('(.*)\.(rev\.)?\d\.\w+', index_file)
+            # should match Bdistachyon_v3.1.assembly.3.bt2 or Bdistachyon_v3.1.assembly.rev.1.bt2
+            # but not bowtie2_index_153005139683.tar.gz
+            # and return Bdistachyon_v3.1.assembly as group 1
             if match:
                 genome_index_base = genome_index_file_dir + '/' + match.group(1)
                 break
 
         if not genome_index_base:
+            # this prefix is a required TopHat parameter
             raise RuntimeError("Unable to parse Bowtie index files")
 
         input_object_info = self._get_input_object_info(params.get('input_ref'))
