@@ -1,3 +1,6 @@
+### Version 1.1.3
+- Updated citations to PLOS format
+
 ### Version 1.1.1
 - Fixed Qualimap PCA plot displaying sample ids not condition ids
 - Fixed alignment statistics
