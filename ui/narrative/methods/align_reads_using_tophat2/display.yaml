@@ -2,9 +2,9 @@
 # Define basic display information
 #
 
-name     : Align Reads using TopHat2 - v1.0.1
+name     : Align Reads using TopHat2 - v2.1.1
 tooltip  : |
-    Align sequencing reads to a reference genome using TopHat2 to identify exon-exon splice junctions.
+    Align sequencing reads to a reference genome using the fast-splice junction mapper TopHat2.
 
 
 screenshots :
@@ -19,7 +19,7 @@ method-suggestions :
     related :
         []
     next :
-        [assemble_transcripts_with_cufflinks,assemble_transcripts_with_stringtie]
+        []
 
 
 #
@@ -28,44 +28,44 @@ method-suggestions :
 parameters :
     input_ref :
         ui-name : |
-            RNA-seq Sample or SampleSet
+            RNAseqSample(Set) or ReadsLibrary
         short-hint : |
-            Select the RNA-seq SampleSet. If you have only one sample of RNA-seq reads, select the corresponding library object.
+            Select the RNA-seq SampleSet for alignment. If you have only one sample of RNA-seq reads, select the corresponding library object.
     assembly_or_genome_ref :
         ui-name : |
             Assembly or Genome
         short-hint : |
-            Select the assembly or genome to align the reads.
+            Select the Assembly or Genome object against which to align the reads.
     alignment_suffix :
         ui-name : |
             Alignment Name Suffix
         short-hint : |
-            Provide a suffix to append the individual Reads object to name each Alignment object
+            Provide a suffix that will be appended to the name of the output Alignment.
     alignment_set_suffix :
         ui-name : |
-            AlignmentSet Name Suffix
+            Alignment Set Name Suffix
         short-hint : |
-            Provide a suffix to append the Set to name the AlignmentSet
+            Provide a suffix that will be appended to the name of the output AlignmentSet.
     read_mismatches :
         ui-name : |
             Read Mismatch Cutoff
         short-hint : |
-            Final read alignments with more than this many mismatches are discarded.
+            Any final read alignments with more than this many mismatches are discarded.
     read_gap_length :
         ui-name : |
             Read Gap Cutoff
         short-hint : |
-            Final read alignments with more than this many gaps are discarded.
+            Any final read alignments with more than this many gaps are discarded.
     read_edit_dist :
         ui-name : |
             Read Edit Cutoff
         short-hint : |
-            Final read alignments with more than this many edits are discarded.
+            Any final read alignments with more than this many edits are discarded.
     min_intron_length :
         ui-name : |
             Minimum Intron Length
         short-hint : |
-            TopHat will ignore donor/acceptor pairs closer than this many bases apart.
+            Donor/acceptor pairs farther than this many bases apart will be ignored.
     max_intron_length :
         ui-name : |
             Maximum Intron Length
@@ -75,7 +75,7 @@ parameters :
         ui-name : |
             Minimum Anchor Length
         short-hint : |
-            TopHat will report junctions spanned by reads with at least this many bases on each side of the junction. This must be at least 3 and the default is 8.
+            TopHat will report junctions spanned by reads with at least this many bases on each side of the junction. The minimum allowed is 3, and the default is 8.
     report_secondary_alignments :
         ui-name : |
             Report Secondary Alignments
@@ -85,7 +85,7 @@ parameters :
         ui-name : |
             No Coverage Search
         short-hint : |
-            Use this option to disable the coverage-based search for junctions.
+            Disable the coverage-based search for junctions.
     library_type :
         ui-name : |
             Library Type
@@ -95,22 +95,22 @@ parameters :
         ui-name : |
             Bowtie2 Alignment Preset Options
         short-hint : |
-            Select the preset options to Bowtie2 for how reads are mapped.
-        long-hint : |
-            Faster option is generally less sensitive and vice versa.
+            Select Bowtie2 to map reads in faster vs. more sensitives modes.
     reads_condition:
         ui-name : |
-            RNA-seq reads condition
+            RNA-seq Reads Condition
         short-hint : |
-            Set the condition associated with the input reads object. This is required for a single sample, but ignored for sets of samples, since that is included in the set.
-        long-hint : |
-            Set the condition associated with the input reads object. This is required for a single sample, but ignored for sets of samples, since that is included in the set.
+            Set the condition for the reads, if there is one ReadsLibrary or sample. Ignore this for a set of multiple samples.
 description : |
-    <p>This App aligns the sequencing reads for a set of two or more samples to a genome using TopHat2 in order to identify splice junctions between exons with the help of Bowtie2 mapping program. Alternatively, if the user has only a single sample of reads or set of reads, this App will take single-end or paired-end library object or reads set instead of a sample set.</p>
-    <p>In addition, it outputs the Qualimap generated BAM alignment QC report that includes global summary such as total number of mapped reads, mean samples coverage, mean samples GC-content, mean samples mapping quality, and sample statistics for each sample along with PCA and coverage statistics in histograms.</p>
-    <p><strong>NOTE:</strong> This method is one of the steps of the <a href= "http://kbase.us/rna-seq/"> KBase RNA-seq Pipeline </a>, however it can also be run standalone for one or more samples.</p>
+    <p>This App aligns the sequencing reads from a ReadsLibrary or a sample set of reads to long reference sequences of an Assembly or a Genome using HISAT2 and outputs corresponding Alignments in BAM format.</p>
 
-    <p><strong>Team members who developed & deployed algorithm in KBase:</strong> Tianhao Gu, Christopher Henry, Shane Canon, Stephen Chan, Jason Baumohl, Sean McCorkle, Sunita Kumari, Shinjae Yoo, Priya Ranjan, Vivek Kumar</p>
+    <p>In addition, it outputs the Qualimap-generated BAM QC report for each Alignment(Set), which includes a global and individual sample-wise summary of the number of mapped reads, coverage, GC-content, mapping quality, etc. in tabular format and various plots such as PCA and coverage histograms to visualize the tabular data.</p>
+
+    <p>TopHat2 is a fast splice junction mapper for RNA-Seq reads that first aligns reads using the Bowtie mapper and then analyzes the mapping to characterize splice junctions. HISAT2 is a successor of TopHat2 and is also available in KBase.</p>
+
+    <p><strong>NOTE:</strong> This App is one of the steps of the <a href= "http://kbase.us/expression-analysis/"> Transcriptomics and Expression Analysis in KBase </a> </p>
+
+    <p><strong>Team members who developed & deployed algorithm in KBase:</strong> Tianhao Gu, Christopher Henry, Shane Canon, Stephen Chan, Jason Baumohl, Sean McCorkle, Sunita Kumari, Shinjae Yoo, Priya Ranjan, and Vivek Kumar. For questions, please <a href="http:kbase.us/contact-us/>contact us</a>.</p>
 
 publications :
 
